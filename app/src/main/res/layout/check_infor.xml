@@ -40,7 +40,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/etxtHoten"
+            android:id="@+id/edtHoten"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/black"
@@ -65,7 +65,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/editTextTextPersonName2"
+            android:id="@+id/edtDiachi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/black"
@@ -91,7 +91,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/editTextTextPersonName3"
+            android:id="@+id/edtCc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/black"
@@ -116,7 +116,7 @@
             android:textStyle="bold" />
         <!-- EditText để nhập ngày tháng năm -->
         <EditText
-            android:id="@+id/editTextDate"
+            android:id="@+id/edtDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/black"
@@ -186,7 +186,7 @@
         android:textStyle="bold" />
 
     <EditText
-        android:id="@+id/editTextTextMultiLine"
+        android:id="@+id/edtBoSung"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -197,7 +197,7 @@
         android:inputType="textMultiLine" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/btnConfirm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner"
@@ -208,7 +208,7 @@
         android:text="Xác nhận" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/btnBackSignUp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner"

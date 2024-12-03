@@ -1,17 +1,186 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F5F5"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_margin="10dp"
+    android:background="#00CED1 "
+    android:padding="16dp">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <!-- Header -->
+    <LinearLayout
+
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme" />
+        android:baselineAligned="true"
+        android:foregroundTint="#7B18A5"
+        android:background="@drawable/header_border"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="30dp"
+        android:paddingBottom="8dp">
 
+        <!-- Nút Hủy -->
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Hủy"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <!-- Tiêu đề -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_marginRight="45dp"
+            android:text="Thêm Giao Dịch"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Trường số tiền -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/header_border"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="20dp"
+        android:paddingVertical="8dp">
+
+        <!-- Icon tiền tệ -->
+        <TextView
+            android:id="@+id/tv_currency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="VND"
+            android:textSize="16sp"
+            android:padding="8dp"
+            android:textColor="@color/black" />
+
+        <!-- Nhập số tiền -->
+        <EditText
+            android:id="@+id/et_amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="0"
+            android:textSize="24sp"
+            android:textColor="@color/black"
+            android:inputType="numberDecimal"
+            android:gravity="center_vertical"
+            android:padding="8dp" />
+    </LinearLayout>
+
+    <!-- Chọn nhóm -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/header_border"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp">
+
+        <!-- Icon -->
+        <ImageView
+            android:id="@+id/img_groupCate"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/img_cate" />
+
+        <TextView
+            android:id="@+id/tv_cate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <!-- Spinner để chọn nhóm -->
+        <Spinner
+            android:id="@+id/spinner_groups"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown"/>
+
+    </LinearLayout>
+
+    <!-- Ghi chú -->
+    <LinearLayout
+        android:background="@drawable/header_border"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp"
+        android:gravity="center_vertical"
+        android:paddingVertical="8dp">
+
+        <ImageView
+            android:id="@+id/img_note"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/img_note"/>
+
+        <EditText
+            android:id="@+id/tv_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:padding="8dp"
+            android:text="Ghi chú"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- Ngày -->
+    <LinearLayout
+        android:background="@drawable/header_border"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp"
+        android:gravity="center_vertical"
+        android:paddingVertical="8dp">
+
+        <ImageView
+            android:id="@+id/img_date"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/img_datetime"
+            />
+
+        <TextView
+            android:id="@+id/tv_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:paddingStart="16dp"
+            android:text="Chọn ngày bạn muốn thêm"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- Nút Lưu -->
+    <Button
+        android:background="@drawable/header_border"
+        android:backgroundTint="#F5F5F5"
+        android:id="@+id/btn_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thêm"
+        android:textSize="40dp"
+        android:textAllCaps="false"
+        android:layout_marginTop="16dp"
+        android:paddingVertical="6dp"
+        android:textColor="#1E90FF" />
 </LinearLayout>

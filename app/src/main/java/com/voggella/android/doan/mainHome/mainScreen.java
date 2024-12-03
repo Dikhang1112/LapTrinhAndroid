@@ -1,12 +1,16 @@
 package com.voggella.android.doan.mainHome;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.voggella.android.doan.GiaoDienLogin.ScreenWait;
 import com.voggella.android.doan.R;
 
 public class mainScreen extends AppCompatActivity {
@@ -15,15 +19,45 @@ public class mainScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
 
-        Button k = findViewById(R.id.btnKHang);
+        ImageView imgChart = findViewById(R.id.btn_dashboard);
+        ImageView imgPlus = findViewById(R.id.btn_add);
+        ImageView imgCate = findViewById(R.id.btn_cate);
+        ImageView imgAccount = findViewById(R.id.btn_profile);
 
-        k.setOnClickListener(new View.OnClickListener() {
+        imgChart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(mainScreen.this, "KKKKKK", Toast.LENGTH_SHORT).show();
+                Intent intentChart = new Intent(mainScreen.this,chartJs.class);
+                startActivity(intentChart);
+                finish();
+            }
+        });
+        imgPlus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intentAdd = new Intent(mainScreen.this,add_Money.class);
+                startActivity(intentAdd);
+                finish();
             }
         });
 
+        imgCate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intentCate = new Intent(mainScreen.this,cate_view.class);
+                startActivity(intentCate);
+                finish();
+
+            }
+        });
+        imgAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intentAccount = new Intent(mainScreen.this,account_Setting.class);
+                startActivity(intentAccount);
+                finish();
+            }
+        });
 
     }
 }

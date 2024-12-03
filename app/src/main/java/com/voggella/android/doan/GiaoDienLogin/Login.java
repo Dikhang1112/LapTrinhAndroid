@@ -36,13 +36,5 @@ btnSignup.setOnClickListener(new View.OnClickListener() {
         startActivity(intent);
     }
 });
-Button img = findViewById(R.id.btn331);
-
-img.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-        Toast.makeText(Login.this,"Khang",Toast.LENGTH_SHORT).show();
-    }
-});
     }
 }

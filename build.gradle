@@ -5,14 +5,14 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        // Thay đổi phiên bản AGP về 7.4.0-rc03
-        classpath 'com.android.tools.build:gradle:7.3.1'
-
+        classpath 'com.android.tools.build:gradle:7.4.0'
     }
 }
+
+
 plugins {
-    id 'com.android.application' version '7.3.1' apply false
-    id 'com.android.library' version '7.3.1' apply false
+    id 'com.android.application' version '7.4.0-rc03' apply false
+    id 'com.android.library' version '7.4.0-rc03' apply false
 }
     allprojects {
         repositories {

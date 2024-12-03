@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name="androidx.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,8 +16,12 @@
         <activity android:name=".GiaoDienLogin.SignUp"></activity>
         <activity android:name=".GiaoDienLogin.ChangePass"></activity>
         <activity android:name=".GiaoDienLogin.ScreenWait"></activity>
+        <activity android:name=".GiaoDienLogin.checkInfor"></activity>
         <activity android:name=".mainHome.mainScreen"></activity>
         <activity android:name=".mainHome.chartJs"></activity>
+        <activity android:name=".mainHome.add_Money"></activity>
+        <activity android:name=".mainHome.cate_view"></activity>
+        <activity android:name=".mainHome.account_Setting"></activity>
         <activity android:name = ".GiaoDienLogin.Login"
                 android:exported="true">
             <intent-filter>
@@ -25,4 +30,6 @@
             </intent-filter>
         </activity>
     </application>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 </manifest>
