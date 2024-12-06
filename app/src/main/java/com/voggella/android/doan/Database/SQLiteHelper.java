@@ -22,9 +22,8 @@ public class SQLiteHelper extends SQLiteOpenHelper
 
      //Thuoc tinh cua bang Account
      public static String  TB_Account_Id = "Acccount_Id";
-     public static String  TB_Account_Name = "Acccount_Name";
-     public static String  TB_Account_Type = "Acccount_Type";
      public static String  TB_Account_Role = "Acccount_Role";
+     public static String  TB_Account_UserSdt = "Users_SDT";
 
      //Thuoc tinh cua users
     public static final String COLUMN_USER_SDT = "Users_SDT";
@@ -76,10 +75,10 @@ public class SQLiteHelper extends SQLiteOpenHelper
                 + COLUMN_USER_SDT + " TEXT PRIMARY KEY, "  // Đặt Users_SDT là khóa chính
                 + COLUMN_USER_NAME + " TEXT, "
                 + COLUMN_USER_PASSWORD + " TEXT, "
-                + COLUMN_USER_TYPE + " TEXT, "
+                + COLUMN_USER_TYPE + " INTERGER, "
                 + COLUMN_USER_CCCD + " TEXT, "
                 + COLUMN_USER_BIRTHDAY + " TEXT, "
-                + COLUMN_USER_SEX + " TEXT, "
+                + COLUMN_USER_SEX + " INTERGER, "
                 + COLUMN_USER_ADDRESS + " TEXT,"
                 + COLUMN_USER_NOTE +   " TEXT"
                 + ")";
@@ -103,34 +102,58 @@ public class SQLiteHelper extends SQLiteOpenHelper
             Log.e("SQLiteHelper", "Người dùng với số điện thoại " + sdt + " đã tồn tại!");
             return;
         }
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_USER_SDT, sdt); // Số điện thoại
-        values.put(COLUMN_USER_PASSWORD, password); // Mật khẩu
-        values.put(COLUMN_USER_NAME, fullName); // Họ và tên
-        values.put(COLUMN_USER_ADDRESS, address); // Địa chỉ
-        values.put(COLUMN_USER_BIRTHDAY, birthDate); // Ngày sinh
-        values.put(COLUMN_USER_CCCD, cccd); // CCCD
-        values.put(COLUMN_USER_SEX, sex); // Giới tính
-        values.put(COLUMN_USER_TYPE, type); // Loại người dùng (user/admin)
-        values.put(COLUMN_USER_NOTE,notes); //Ghi chu them
-        db.insert(TABLE_USERS, null, values);
-        long result = db.insert(TABLE_USERS, null, values);
-        if (result == -1) {
-            Log.e("SQLiteHelper", "Failed to insert user with SDT: " + sdt);
-        } else {
-            Log.d("SQLiteHelper", "User added successfully with SDT: " + sdt);
+        SQLiteDatabase db = null;
+        try {
+            db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_USER_SDT, sdt);
+            values.put(COLUMN_USER_PASSWORD, password);
+            values.put(COLUMN_USER_NAME, fullName);
+            values.put(COLUMN_USER_ADDRESS, address);
+            values.put(COLUMN_USER_BIRTHDAY, birthDate);
+            values.put(COLUMN_USER_CCCD, cccd);
+            values.put(COLUMN_USER_SEX, Integer.parseInt(sex));
+            values.put(COLUMN_USER_TYPE, Integer.parseInt(type));
+            values.put(COLUMN_USER_NOTE, notes);
+            long result = db.insert(TABLE_USERS, null, values);
+            if (result == -1) {
+                Log.e("SQLiteHelper", "Failed to insert user with SDT: " + sdt);
+            } else {
+                Log.d("SQLiteHelper", "User added successfully with SDT: " + sdt);
+            }
+        } catch (Exception e) {
+            Log.e("SQLiteHelper", "Error adding user: " + e.getMessage());
+        } finally {
+            if (db != null) db.close();
         }
-        db.close();
     }
 
     public boolean isUserExists(String sdt) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_USERS, new String[]{COLUMN_USER_SDT}, COLUMN_USER_SDT + "=?", new String[]{sdt}, null, null, null);
-        boolean exists = cursor.moveToFirst();
-        Log.d("SQLiteHelper", "isUserExists: " + sdt + " exists? " + exists);
-        cursor.close();
-        return exists;
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TABLE_USERS, new String[]{COLUMN_USER_SDT}, COLUMN_USER_SDT + "=?", new String[]{sdt}, null, null, null);
+            return cursor.moveToFirst(); // Trả về true nếu có dữ liệu
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();  // Đóng kết nối
+        }
     }
 
+
+    public boolean validateUser(String phone, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            String query = "SELECT * FROM " + TABLE_USERS + " WHERE " + COLUMN_USER_SDT + " = ? AND " + COLUMN_USER_PASSWORD + " = ?";
+            cursor = db.rawQuery(query, new String[]{phone, password});
+            return cursor.moveToFirst(); // Trả về true nếu có dữ liệu
+        } catch (Exception e) {
+            Log.e("SQLiteHelper", "Error validating user: " + e.getMessage());
+            return false; // Trả về false nếu có lỗi
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();  // Đóng kết nối
+        }
+    }
 }

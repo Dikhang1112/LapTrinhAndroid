@@ -49,6 +49,14 @@ public class checkInfor  extends AppCompatActivity {
             // Lưu dữ liệu vào SQLite
             dbHelper.addUser(phone, password1, fullName, address, dob, cccd, gender,notes,"user");
             Toast.makeText(this, "Lưu thành công!", Toast.LENGTH_SHORT).show();
+            if (dbHelper.isUserExists(phone)) {
+                Toast.makeText(this, "Số điện thoại đã tồn tại!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (radioGender.getCheckedRadioButtonId() == -1) {
+                Toast.makeText(this, "Vui lòng chọn giới tính!", Toast.LENGTH_SHORT).show();
+                return;
+            }
         });
 
 //        Nút trở về
