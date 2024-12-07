@@ -90,7 +90,7 @@ public class ChangePass extends AppCompatActivity {
             Toast.makeText(this, "Số điện thoại không tồn tại!", Toast.LENGTH_SHORT).show();
             return false;
         }
-        int rowsUpdated = db.update(SQLiteHelper.TABLE_USERS, values, SQLiteHelper.COLUMN_USER_SDT + "=?", new String[]{phone});
+        int rowsUpdated = db.update(SQLiteHelper.TB_USERS, values, SQLiteHelper.COLUMN_USER_SDT + "=?", new String[]{phone});
         db.close();
 
         if (rowsUpdated > 0) {

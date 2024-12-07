@@ -14,23 +14,29 @@ import com.voggella.android.doan.mainHome.mainScreen;
 
 public class ScreenWait extends AppCompatActivity {
 
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.screen_wait);
-        Toast.makeText(ScreenWait.this,
-                "Chuyển sau " + " 5 giây",
-                Toast.LENGTH_SHORT).show();
+
+        // Nhận họ và tên người dùng từ Intent
+        String userFullName = getIntent().getStringExtra("USER_FULL_NAME");
+
+        Toast.makeText(ScreenWait.this, "Chuyển qua trang chủ sau 5 giây...", Toast.LENGTH_SHORT).show();
+
         new CountDownTimer(5000, 500) {
             public void onTick(long millisUntilFinished) {
-                // Hiển thị Toast mỗi giây
-
+                // Có thể hiển thị thời gian còn lại ở đây nếu cần
             }
+
             public void onFinish() {
-                // Khi đếm ngược kết thúc, chuyển sang layout 2
+                // Chuyển sang màn hình chính và truyền họ và tên người dùng
                 Intent intentMain = new Intent(ScreenWait.this, mainScreen.class);
+                intentMain.putExtra("USER_FULL_NAME", userFullName);  // Truyền họ và tên người dùng
                 startActivity(intentMain);
-                finish();
+                finish();  // Đóng màn hình chờ
             }
         }.start();
     }
 }
+

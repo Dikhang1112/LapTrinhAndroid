@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <!-- TextView for transaction type -->
+    <TextView
+        android:id="@+id/tv_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Transaction Type"
+        android:textColor="#FF0000"
+        android:layout_weight="1"
+        android:textSize="25sp"/>
+
+    <!-- TextView for transaction amount -->
+    <TextView
+        android:id="@+id/tv_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Amount"
+        android:textColor="#FF0000"
+        android:layout_weight="1"
+        android:textSize="25sp"
+        android:paddingStart="16dp"/>
+
+    <!-- TextView for transaction date -->
+    <TextView
+        android:id="@+id/tv_dateTrans"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date"
+        android:textColor="#FF0000"
+        android:layout_weight="1"
+        android:textSize="25sp"
+        android:paddingStart="16dp"/>
+
+</LinearLayout>

@@ -51,7 +51,7 @@ public class SignIn extends AppCompatActivity {
                 if (isValid) {
                     // Nếu hợp lệ, truy vấn để lấy họ và tên từ cơ sở dữ liệu
                     SQLiteDatabase db = dbHelper.getReadableDatabase();
-                    Cursor cursor = db.query(SQLiteHelper.TABLE_USERS,
+                    Cursor cursor = db.query(SQLiteHelper.TB_USERS,
                             new String[]{SQLiteHelper.COLUMN_USER_NAME},
                             SQLiteHelper.COLUMN_USER_SDT + " = ?",
                             new String[]{phone},
@@ -62,11 +62,12 @@ public class SignIn extends AppCompatActivity {
                         userFullName = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_USER_NAME));
                         cursor.close();
                     }
-                    // Chuyển sang màn hình chính và truyền họ và tên người dùng
-                    Intent intent = new Intent(SignIn.this, mainScreen.class);
-                    intent.putExtra("USER_FULL_NAME", userFullName);  // Truyền họ và tên
-                    startActivity(intent);
-                    finish();  // Để không quay lại màn hình đăng nhập
+
+                    // Chuyển sang màn hình chờ (ScreenWait) và truyền thông tin người dùng
+                    Intent intentWait = new Intent(SignIn.this, ScreenWait.class);
+                    intentWait.putExtra("USER_FULL_NAME", userFullName);  // Truyền họ và tên người dùng
+                    startActivity(intentWait);
+                    finish();  // Đóng màn hình đăng nhập
                 } else {
                     Toast.makeText(SignIn.this, "Sai số điện thoại hoặc mật khẩu!", Toast.LENGTH_SHORT).show();
                 }
@@ -74,7 +75,6 @@ public class SignIn extends AppCompatActivity {
                 Toast.makeText(SignIn.this, "Đã xảy ra lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
         Button changePass = findViewById(R.id.changepass);
         changePass.setOnClickListener(view -> {
             String phone = edtPhone.getText().toString().trim();  // Lấy số điện thoại từ EditText
