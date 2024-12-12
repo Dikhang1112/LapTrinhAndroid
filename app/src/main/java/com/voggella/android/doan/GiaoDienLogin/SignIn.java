@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -58,14 +59,18 @@ public class SignIn extends AppCompatActivity {
                             null, null, null);
 
                     String userFullName = "";
+
                     if (cursor != null && cursor.moveToFirst()) {
                         userFullName = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_USER_NAME));
                         cursor.close();
                     }
+                    //Kiem tra sdt da nhan duoc chua
+                    Log.d("SignIn", "Số điện thoại: " + phone);
 
                     // Chuyển sang màn hình chờ (ScreenWait) và truyền thông tin người dùng
                     Intent intentWait = new Intent(SignIn.this, ScreenWait.class);
                     intentWait.putExtra("USER_FULL_NAME", userFullName);  // Truyền họ và tên người dùng
+                    intentWait.putExtra("USERS_SDT", phone); //Truyen sdt
                     startActivity(intentWait);
                     finish();  // Đóng màn hình đăng nhập
                 } else {

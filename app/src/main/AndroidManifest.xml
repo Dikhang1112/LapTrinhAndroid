@@ -20,9 +20,9 @@
         <activity android:name=".GiaoDienLogin.ScreenWait"></activity>
         <activity android:name=".GiaoDienLogin.checkInfor"></activity>
         <activity android:name=".mainHome.mainScreen"></activity>
-        <activity android:name=".mainHome.chartJs"></activity>
+        <activity android:name=".mainHome.ChartJs"></activity>
         <activity android:name=".mainHome.add_Trans"></activity>
-        <activity android:name=".mainHome.cate_view"></activity>
+        <activity android:name=".mainHome.trans_Detail"></activity>
         <activity android:name=".mainHome.account_Setting"></activity>
 
 

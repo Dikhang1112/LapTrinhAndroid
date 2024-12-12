@@ -1,24 +1,16 @@
-// File: model/Transaction.java
 package com.voggella.android.doan.Database;
-
-public class Transaction {
-    private String type;
+import  com.voggella.android.doan.Database.SQLiteHelper;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+public class Budget {
     private double amount;
     private String date;
 
-    // Constructor
-    public Transaction(String type, double amount, String date) {
-        this.type = type;
+
+    public Budget(double amount, String date) {
         this.amount = amount;
         this.date = date;
-    }
-    // Getter và Setter
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public double getAmount() {
@@ -36,5 +28,7 @@ public class Transaction {
     public void setDate(String date) {
         this.date = date;
     }
-
 }
+
+
+

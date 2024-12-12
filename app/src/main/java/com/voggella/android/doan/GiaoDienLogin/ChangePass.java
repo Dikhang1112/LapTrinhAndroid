@@ -27,7 +27,7 @@ public class ChangePass extends AppCompatActivity {
 
         // Nhận số điện thoại từ Sign In
         Intent intent = getIntent();
-        userPhone = intent.getStringExtra("USER_SDT");
+        userPhone = intent.getStringExtra("USERS_SDT");
 
         // Khởi tạo UI và SQLiteHelper
         initUI();

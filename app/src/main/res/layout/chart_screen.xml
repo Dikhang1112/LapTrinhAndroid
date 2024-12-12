@@ -5,6 +5,7 @@
     android:background="#F1EFEF"
     android:orientation="vertical">
 
+    <!-- Header section with title -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,13 +25,81 @@
             android:textStyle="bold"
             android:textSize="35sp"
             android:textAlignment="center"
-            android:text="Báo cáo tháng 11
-" />
+            android:text="Báo cáo thu chi" />
     </LinearLayout>
+
+    <!-- BarChart -->
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barChart"
         android:layout_marginTop="30dp"
         android:layout_width="match_parent"
-        android:layout_height="300dp" />
+        android:layout_height="350dp" />
 
+    <!-- Section for statistics -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/textview_boder"
+        android:padding="15dp">
+
+        <!-- TextView for Total Income and Total Expense -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/viewThu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tổng thu: 0"
+                android:textSize="20sp"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="10dp"
+                android:padding="10dp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/viewChi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tổng chi: 0"
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!-- TextView for Highest and Lowest Expense -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/viewChiNhieu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Chi nhiều nhất: "
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="10dp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/viewChiIt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Chi ít nhất: "
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"/>
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

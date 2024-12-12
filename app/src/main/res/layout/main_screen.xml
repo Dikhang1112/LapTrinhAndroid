@@ -44,7 +44,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="110dp"
+        android:layout_height="102dp"
         android:background="@drawable/round_corner"
         android:backgroundTint="#00BFFF"
         android:orientation="vertical">
@@ -54,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:text="Duong Vo Duy Khang"
+            android:text=""
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="30sp" />
@@ -63,18 +63,10 @@
             android:id="@+id/ViewBudget"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="So du: 1.000.000d "
+            android:text="Ấn vào để nhập số tiền"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="30sp" />
-
-        <!-- Thêm FrameLayout để chứa Fragment -->
-        <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="20dp"/>
-
     </LinearLayout>
 
     <LinearLayout
@@ -100,9 +92,12 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/viewTrans"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="180dp"
+        android:layout_weight="1"
         android:layout_marginTop="15dp"
         android:layout_marginBottom="10dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:background="#87CEFA" />
 
 

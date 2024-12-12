@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:weightSum="3">
+
+    <!-- TextView for budget amount -->
+    <TextView
+        android:id="@+id/tv_budget_update"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="BUDGET"
+        android:textColor="#32CD32   "
+        android:textSize="20sp"
+        android:gravity="center" />
+
+    <!-- TextView for budget amount -->
+    <TextView
+        android:id="@+id/tv_budget_amount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Amount"
+        android:textColor="#32CD32"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:paddingStart="9dp"/>
+
+    <!-- TextView for budget date -->
+    <TextView
+        android:id="@+id/tv_budget_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Date"
+        android:textColor="#32CD32"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:paddingStart="9dp"/>
+
+</LinearLayout>

@@ -1,4 +1,5 @@
 package com.voggella.android.doan.GiaoDienLogin;
+import com.voggella.android.doan.Database.Budget;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +22,7 @@ public class checkInfor  extends AppCompatActivity {
         setContentView(R.layout.check_infor);
         //Khoi tạo Sql
         dbHelper = new SQLiteHelper(this);
+
         EditText edtFullName = findViewById(R.id.edtHoten);
         EditText edtAddress = findViewById(R.id.edtDiachi);
         EditText edtDateOfBirth = findViewById(R.id.edtDate);
@@ -42,17 +44,29 @@ public class checkInfor  extends AppCompatActivity {
             String cccd = edtCCCD.getText().toString();
             String gender = ((RadioButton) findViewById(radioGender.getCheckedRadioButtonId())).getText().toString();
             String notes = edtNotes.getText().toString();
+
             if (phone.isEmpty() || password1.isEmpty() || fullName.isEmpty() || address.isEmpty()) {
                 Toast.makeText(this, "Vui lòng điền đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // Lưu dữ liệu vào SQLite
-            dbHelper.addUser(phone, password1, fullName, address, dob, cccd, gender,notes,"user");
+            // Lưu dữ liệu vào SQLite User,Budget,Transac,Account,Cate
+            dbHelper.addUser(phone, password1, fullName, address, dob, cccd, gender,notes,"0");
+            dbHelper.insertBudget(phone);
+            dbHelper.insertTran(phone);
+            dbHelper.insertAccount(phone);
+            dbHelper.insertCate(phone);
+
+            //Thong bao
             Toast.makeText(this, "Lưu thành công!", Toast.LENGTH_SHORT).show();
             if (dbHelper.isUserExists(phone)) {
                 Toast.makeText(this, "Số điện thoại đã tồn tại!", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (radioGender.getCheckedRadioButtonId() == -1) {
+                Toast.makeText(this, "Vui lòng chọn giới tính!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            //Kiem tra nguoi dung da chon gioi tinh chua
             if (radioGender.getCheckedRadioButtonId() == -1) {
                 Toast.makeText(this, "Vui lòng chọn giới tính!", Toast.LENGTH_SHORT).show();
                 return;
