@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.voggella.android.doan.mainHome.TransactionShow;
 
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +20,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
 {
     // Tên cơ sở dữ liệu
     private static final String DATABASE_NAME = "ManagementFinancial.db";
-    private static final int DATABASE_VERSION = 1   ; // Tăng giá trị khi thay đổi
+    private static final int DATABASE_VERSION = 5 ; // Tăng giá trị khi thay đổi
 
     //Tên các bảng
     public static final String  TB_Account = "Account";
@@ -44,6 +45,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
     public static final String COLUMN_USER_SEX = "Users_Sex";
     public static final String COLUMN_USER_ADDRESS = "Users_Address";
     public static final String COLUMN_USER_NOTE = "Users_Notes";
+    public static final String COLUMN_USER_IMAGE = "Image";
 
     //Thuoc tinh cua Admin
     public static final String  COLUMN_ADMIN_ID = "Admin_Id";
@@ -128,7 +130,8 @@ public class SQLiteHelper extends SQLiteOpenHelper
                     + COLUMN_USER_SEX + " TEXT,"
                     + COLUMN_USER_TYPE + " INTEGER DEFAULT 0, "
                     + COLUMN_USER_ADDRESS + " TEXT, "
-                    + COLUMN_USER_NOTE + " TEXT"
+                    + COLUMN_USER_NOTE + " TEXT,"
+                    + COLUMN_USER_IMAGE + " TEXT"
                     + ")";
             db.execSQL(CREATE_USERS_TABLE);
             Log.d("SQLiteHelper", "Table " + TB_USERS + " created successfully");
@@ -432,6 +435,50 @@ public class SQLiteHelper extends SQLiteOpenHelper
         db.close();
         return totalAmountByType;
     }
+    public Map<String,Double> getTotalAmountByTypeForMonthAndYear(String phoneUser, int month,  int year) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Map<String, Double> totalAmountByType = new HashMap<>();
+        Cursor cursor = null;
+
+        try {
+            // Tạo câu truy vấn SQL
+            String query = "SELECT " + COLUMN_TRANSACTION_TYPE + ", SUM(" + COLUMN_TRANSACTION_AMOUNT + ") as total_amount " +
+                    "FROM " + TB_Trans + " " +
+                    "WHERE " + COLUMN_TRANSACTION_USERS_SDT + " = ? " +
+                    "AND strftime('%m', " + COLUMN_TRANSACTION_DATE + ") = ? " +
+                    "AND strftime('%Y', " + COLUMN_TRANSACTION_DATE + ") = ? " +
+                    "GROUP BY " + COLUMN_TRANSACTION_TYPE;
+
+            // Định dạng tham số tháng và năm
+            String monthString = String.format("%02d", month);
+            String yearString = String.format("%04d",year);
+
+            // Log truy vấn và tham số
+            Log.d("SQLiteHelper", "Query: " + query);
+            Log.d("SQLiteHelper", "Params: phoneUser=" + phoneUser + ", month=" + monthString + ", year=" + yearString);
+
+            // Thực thi truy vấn
+            cursor = db.rawQuery(query, new String[]{phoneUser, monthString, yearString});
+            // Xử lý dữ liệu từ cursor
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    @SuppressLint("Range") String type = cursor.getString(cursor.getColumnIndex(COLUMN_TRANSACTION_TYPE));
+                    @SuppressLint("Range") double totalAmount = cursor.getDouble(cursor.getColumnIndex("total_amount"));
+                    totalAmountByType.put(type, totalAmount);
+                    Log.d("SQLiteHelper", "Type: " + type + ", Amount: " + totalAmount);
+                } while (cursor.moveToNext());
+            } else {
+                Log.d("SQLiteHelper", "No data found for the query.");
+            }
+        } catch (Exception e) {
+            Log.e("SQLiteHelper", "Error fetching transaction totals", e);
+        } finally {
+            if (cursor != null) cursor.close();
+            // Không đóng db tại đây nếu hàm khác cần sử dụng db
+        }
+        return totalAmountByType;
+    }
+
 }
 
 

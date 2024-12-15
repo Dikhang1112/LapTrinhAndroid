@@ -46,7 +46,7 @@ public class trans_Detail extends AppCompatActivity {
 
         // Tạo adapter cho Spinner
         ArrayAdapter<SQLiteHelper.CategoryName> adapter = new ArrayAdapter<>(
-                this, R.layout.spinner_item, SQLiteHelper.CategoryName.values()
+                this, R.layout.spinner_dropdown_item, SQLiteHelper.CategoryName.values()
         );
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         spinnerTransac.setAdapter(adapter);

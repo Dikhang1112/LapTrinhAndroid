@@ -9,6 +9,8 @@
         android:id="@+id/edtAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:textStyle="bold"
         android:hint="Nhập số tiền"
         android:inputType="numberDecimal" />
 
@@ -16,12 +18,15 @@
         android:id="@+id/edtDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:textStyle="bold"
         android:hint="Nhập ngày (dd/MM/yyyy)"
         android:inputType="date" />
     <Button
         android:id="@+id/btnSave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Lưu"
+        android:text="Thêm số tiền"
+        android:textSize="25sp"
         android:layout_marginTop="16dp" />
 </LinearLayout>

@@ -1,188 +1,261 @@
-    package com.voggella.android.doan.mainHome;
+package com.voggella.android.doan.mainHome;
 
-    import android.database.Cursor;
-    import android.database.sqlite.SQLiteDatabase;
-    import android.os.Bundle;
-    import android.util.Log;
-    import android.widget.TextView;
-    import android.widget.Toast;
-    import androidx.appcompat.app.AppCompatActivity;
-    import com.github.mikephil.charting.charts.BarChart;
-    import com.github.mikephil.charting.data.BarData;
-    import com.github.mikephil.charting.data.BarDataSet;
-    import com.github.mikephil.charting.data.BarEntry;
-    import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-    import com.voggella.android.doan.Database.SQLiteHelper;
-    import com.voggella.android.doan.R;
+import android.annotation.SuppressLint;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
-    import java.util.ArrayList;
-    import java.util.Map;
+import androidx.appcompat.app.AppCompatActivity;
 
-    public class ChartJs extends AppCompatActivity {
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.voggella.android.doan.Database.SQLiteHelper;
+import com.voggella.android.doan.R;
 
-        private BarChart barChart;
-        private String phoneUser;
-        private SQLiteHelper dbHelper;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Map;
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.chart_screen);
+public class ChartJs extends AppCompatActivity {
 
-            //Khoi tao database
-            dbHelper = new SQLiteHelper(this);
+    private BarChart barChart;
+    private String phoneUser;
+    private SQLiteHelper dbHelper;
+    private Spinner monthSpinner, yearSpinner;
 
-            // Khởi tạo BarChart
-            barChart = findViewById(R.id.barChart);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.chart_screen);
 
-            // Lấy số điện thoại của người dùng từ Intent
-            phoneUser = getIntent().getStringExtra("USERS_SDT");
+        // Khởi tạo database
+        dbHelper = new SQLiteHelper(this);
 
-            if (phoneUser == null) {
-                Toast.makeText(this, "Không tìm thấy thông tin người dùng!", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        // Khởi tạo BarChart
+        barChart = findViewById(R.id.barChart);
 
-            // Lấy dữ liệu tổng Amount theo từng loại giao dịch
-            Map<String, Double> totalAmountByType = getTotalAmountByType(phoneUser);
+        // Lấy số điện thoại của người dùng từ Intent
+        phoneUser = getIntent().getStringExtra("USERS_SDT");
 
-            if (totalAmountByType == null || totalAmountByType.isEmpty()) {
-                Toast.makeText(this, "Không có giao dịch cho người dùng này.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            // Tìm loại giao dịch có số tiền cao nhất và thấp nhất
-            String maxType = null, minType = null;
-            double maxAmount = Double.MIN_VALUE;
-            double minAmount = Double.MAX_VALUE;
-
-            for (Map.Entry<String, Double> entry : totalAmountByType.entrySet()) {
-                double amount = entry.getValue();
-                if (amount > maxAmount) {
-                    maxAmount = amount;
-                    maxType = entry.getKey();
-                }
-                if (amount < minAmount) {
-                    minAmount = amount;
-                    minType = entry.getKey();
-                }
-            }
-            TextView viewChiMax = findViewById(R.id.viewChiNhieu);
-            TextView viewChiMin = findViewById(R.id.viewChiIt);
-
-            if (maxType != null && minType != null) {
-                viewChiMax.setText("Chi nhiều nhất: " + maxType);
-                viewChiMin.setText("Chi ít nhất: " + minType);
-            }
-
-            // Danh sách các loại giao dịch (categories) để hiển thị trên trục X
-            ArrayList<String> categories = new ArrayList<>(totalAmountByType.keySet());
-
-            // Dữ liệu cho biểu đồ (tạo BarEntry cho mỗi loại giao dịch)
-            ArrayList<BarEntry> entries = new ArrayList<>();
-            int i = 0;
-            for (Map.Entry<String, Double> entry : totalAmountByType.entrySet()) {
-                // Thêm vào BarEntry (i là vị trí cột, entry.getValue() là giá trị tổng Amount)
-                entries.add(new BarEntry(i, entry.getValue().floatValue()));
-                i++;
-            }
-            Log.d("ChartJs", "Số lượng cột: " + entries.size());
-            // Tạo BarDataSet
-            BarDataSet barDataSet = new BarDataSet(entries, "Số tiền cho các giao dịch");
-            barDataSet.setColor(getResources().getColor(R.color.colorPrimary));
-            // Ẩn các nhãn trên các cột
-            barDataSet.setDrawValues(false);
-            // Tạo BarData
-            BarData barData = new BarData(barDataSet);
-            // Thiết lập các thuộc tính của biểu đồ
-            configureChartAppearance();
-            // Cài đặt dữ liệu cho biểu đồ
-            barChart.setData(barData);
-            // Tạo hiệu ứng động cho biểu đồ
-            barChart.animateXY(2000,2000); // Tạo hiệu ứng động theo chiều Y trong 1000ms (1 giây)
-            barChart.invalidate(); // Cập nhật lại biểu đồ
-            //Khoi tao cac textView
-            TextView viewThu = findViewById(R.id.viewThu);
-            TextView viewChi = findViewById(R.id.viewChi);
-
-             //Set cac gia tri cho text View
-            double totalThu = getTotalBudget(phoneUser);
-            double totalChi = getTotalTransaction(phoneUser);
-            String totalBudget = "Tổng thu:" + totalThu + " vnd";
-            String totalTran = "Tổng chi:" + totalChi + " vnd";
-            viewThu.setText(totalBudget);
-            viewChi.setText(totalTran);
+        if (phoneUser == null) {
+            Toast.makeText(this, "Không tìm thấy thông tin người dùng!", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        private Map<String, Double> getTotalAmountByType(String sdt) {
-            SQLiteHelper dbHelper = new SQLiteHelper(this);
-            Map<String, Double> result = dbHelper.getTotalAmountByType(sdt);
+        // Cài đặt Spinner cho danh sách tháng
+        monthSpinner = findViewById(R.id.monthSpinner);
+        ArrayAdapter<CharSequence> adapterMonth = ArrayAdapter.createFromResource(this, R.array.months_array, R.layout.spinner_dropdown_item);
+        adapterMonth.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        monthSpinner.setAdapter(adapterMonth);
 
-            if (result == null || result.isEmpty()) {
-                Log.d("ChartJs", "Không có dữ liệu giao dịch.");
-            } else {
-                Log.d("ChartJs", "Dữ liệu giao dịch: " + result.toString());
+        // Cài đặt Spinner cho danh sách năm
+        yearSpinner = findViewById(R.id.yearSpinner);
+        ArrayAdapter<CharSequence> adapterYear = ArrayAdapter.createFromResource(this, R.array.years_array, R.layout.spinner_dropdown_item);
+        adapterYear.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        yearSpinner.setAdapter(adapterYear);
+
+        // Lắng nghe sự kiện chọn tháng và năm
+        AdapterView.OnItemSelectedListener listener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                updateChartAndSummary();
             }
-            return result;
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Không làm gì
+            }
+        };
+
+        monthSpinner.setOnItemSelectedListener(listener);
+        yearSpinner.setOnItemSelectedListener(listener);
+
+        // Tải dữ liệu mặc định (tháng và năm hiện tại)
+        Calendar calendar = Calendar.getInstance();
+        monthSpinner.setSelection(calendar.get(Calendar.MONTH));
+        yearSpinner.setSelection(calendar.get(Calendar.YEAR) - 2020); // Nếu năm bắt đầu từ 2020
+        updateChartAndSummary();
+    }
+
+    private void updateChartAndSummary() {
+        int selectedMonth = monthSpinner.getSelectedItemPosition() + 1; // Lấy tháng từ Spinner
+        String selectedYear = yearSpinner.getSelectedItem().toString(); // Lấy năm từ Spinner
+
+        // Lấy số năm thực sự, loại bỏ phần chữ "Năm " nếu có
+        selectedYear = selectedYear.replace("Năm ", "");
+
+        updateChartForMonthAndYear(selectedMonth, selectedYear);
+        updateSummaryInfo(selectedMonth, selectedYear);
+        getMostAndLeastFrequentTransactionTypes(phoneUser, selectedMonth, selectedYear);
+    }
+
+
+    private void updateChartForMonthAndYear(int month, String year) {
+        Map<String, Double> totalAmountByType = dbHelper.getTotalAmountByTypeForMonthAndYear(phoneUser, month, Integer.parseInt(year));
+
+        if (totalAmountByType == null && totalAmountByType.isEmpty()) {
+            Toast.makeText(this, "Không có giao dịch cho tháng và năm này.", Toast.LENGTH_SHORT).show();
+            barChart.clear();
+            barChart.invalidate();
+            return;
         }
-        // Phương thức cấu hình giao diện biểu đồ
-        private void configureChartAppearance() {
-            // Điều chỉnh trục X và Y để hiển thị rõ hơn
-            barChart.getXAxis().setPosition(com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTTOM);
-            barChart.getXAxis().setGranularity(1f);  // Đảm bảo mỗi cột có nhãn riêng
-            barChart.getXAxis().setTextSize(12f);  // Thay đổi kích thước chữ trên trục X
-            // Thiết lập trục Y
-            barChart.getAxisLeft().setEnabled(true);  // Hiển thị trục Y trái
-            barChart.getAxisRight().setEnabled(false);  // Tắt trục Y phải
-            barChart.getAxisLeft().setTextSize(12f); // Kích thước chữ trục Y
-            barChart.getAxisLeft().setGranularity(1f); // Đảm bảo các nhãn trục Y hiển thị đúng
-            // Thiết lập trục X (nhãn cho các loại giao dịch)
-            barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(new ArrayList<>(getTotalAmountByType(phoneUser).keySet())));
-            // Tắt phần mô tả dưới biểu đồ
-            barChart.getDescription().setEnabled(false);
 
+        ArrayList<String> categories = new ArrayList<>(totalAmountByType.keySet());
+        ArrayList<BarEntry> entries = new ArrayList<>();
+        int i = 0;
+        for (Map.Entry<String, Double> entry : totalAmountByType.entrySet()) {
+            entries.add(new BarEntry(i, entry.getValue().floatValue()));
+            i++;
         }
-        //Tinh tong thu
-        private double getTotalBudget(String phoneUser) {
-            SQLiteDatabase db = dbHelper.getReadableDatabase();
-            double total = 0;
-            Cursor cursor = null;
+        BarDataSet barDataSet = new BarDataSet(entries, "Số tiền cho các giao dịch");
+        barDataSet.setValueTextSize(10f);
+        barDataSet.setValueTextColor(Color.MAGENTA);
+        barDataSet.setColor(getResources().getColor(R.color.colorPrimary));
+        barDataSet.setDrawValues(false);
+        BarData barData = new BarData(barDataSet);
+        barChart.setData(barData);
+        barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(categories));
+        configureChartAppearance();
+        barChart.animateXY(1000, 1000);
+        barChart.invalidate();
+    }
 
-            try {
-                String query = "SELECT SUM(" + SQLiteHelper.COLUMN_BUDGET_DATA + ") FROM " + SQLiteHelper.TB_Budget + " WHERE " + SQLiteHelper.COLUMN_BUDGET_USERS_SDT + " = ?";
-                cursor = db.rawQuery(query, new String[]{phoneUser});
+    private void updateSummaryInfo(int month, String year) {
+        TextView viewThu = findViewById(R.id.viewThu);
+        TextView viewChi = findViewById(R.id.viewChi);
 
-                if (cursor != null && cursor.moveToFirst()) {
-                    total = cursor.getDouble(0);
-                }
-            } catch (Exception e) {
-                Log.e("mainScreen", "Lỗi khi tính tổng ngân sách", e);
-            } finally {
-                if (cursor != null) cursor.close();
+        double totalThu = getTotalBudgetForMonthAndYear(phoneUser, month, year);
+        double totalChi = getTotalTransactionForMonthAndYear(phoneUser, month, year);
+
+        viewThu.setText("Tổng thu: " + totalThu + " VND");
+        viewChi.setText("Tổng chi: " + totalChi + " VND");
+    }
+
+    private double getTotalBudgetForMonthAndYear(String phoneUser, int month, String year) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        double total = 0;
+        Cursor cursor = null;
+
+        try {
+            String query = "SELECT SUM(" + SQLiteHelper.COLUMN_BUDGET_DATA + ") " +
+                    "FROM " + SQLiteHelper.TB_Budget + " " +
+                    "WHERE " + SQLiteHelper.COLUMN_BUDGET_USERS_SDT + " = ? " +
+                    "AND strftime('%m', substr(" + SQLiteHelper.COLUMN_BUDGET_DATE + ", 7, 4) || '-' || substr(" + SQLiteHelper.COLUMN_BUDGET_DATE + ", 4, 2) || '-' || substr(" + SQLiteHelper.COLUMN_BUDGET_DATE + ", 1, 2)) = ? " +
+                    "AND strftime('%Y', substr(" + SQLiteHelper.COLUMN_BUDGET_DATE + ", 7, 4) || '-' || substr(" + SQLiteHelper.COLUMN_BUDGET_DATE + ", 4, 2) || '-' || substr(" + SQLiteHelper.COLUMN_BUDGET_DATE + ", 1, 2)) = ?";
+
+            String monthString = String.format("%02d", month);
+            cursor = db.rawQuery(query, new String[]{phoneUser, monthString, year});
+
+            if (cursor != null && cursor.moveToFirst()) {
+                total = cursor.getDouble(0);
+            }
+        } catch (Exception e) {
+            Log.e("ChartJs", "Lỗi khi tính tổng ngân sách theo tháng và năm", e);
+        } finally {
+            if (cursor != null) cursor.close();
+            if (db != null) db.close();
+        }
+
+        return total;
+    }
+
+    private double getTotalTransactionForMonthAndYear(String phoneUser, int month, String year) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        double total = 0;
+        Cursor cursor = null;
+
+        try {
+            String query = "SELECT SUM(" + SQLiteHelper.COLUMN_TRANSACTION_AMOUNT + ") " +
+                    "FROM " + SQLiteHelper.TB_Trans + " " +
+                    "WHERE " + SQLiteHelper.COLUMN_TRANSACTION_USERS_SDT + " = ? " +
+                    "AND strftime('%m', " + SQLiteHelper.COLUMN_TRANSACTION_DATE + ") = ? " +
+                    "AND strftime('%Y', " + SQLiteHelper.COLUMN_TRANSACTION_DATE + ") = ?";
+
+            String monthString = String.format("%02d", month);
+            cursor = db.rawQuery(query, new String[]{phoneUser, monthString, year});
+
+            if (cursor != null && cursor.moveToFirst()) {
+                total = cursor.getDouble(0);
+            }
+        } catch (Exception e) {
+            Log.e("ChartJs", "Lỗi khi tính tổng giao dịch theo tháng và năm", e);
+        } finally {
+            if (cursor != null) cursor.close();
+            if (db != null)
                 if (db != null) db.close();
-            }
-
-            return total;
         }
+        return total;
+    }
 
-        // Lấy tổng tiền trong bảng Transaction
-        private double getTotalTransaction(String phoneUser) {
-            SQLiteDatabase db = dbHelper.getReadableDatabase();
-            double total = 0;
-            Cursor cursor = null;
+    private void configureChartAppearance() {
+        barChart.getXAxis().setPosition(com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTTOM);
+        barChart.getXAxis().setGranularity(1f);
+        barChart.getXAxis().setTextSize(12f);
+        barChart.getAxisLeft().setEnabled(true);
+        barChart.getAxisRight().setEnabled(false);
+        barChart.getAxisLeft().setTextSize(12f);
+        barChart.getDescription().setEnabled(false);
+    }
 
-            try {
-                String query = "SELECT SUM(" + SQLiteHelper.COLUMN_TRANSACTION_AMOUNT + ") FROM " + SQLiteHelper.TB_Trans + " WHERE " + SQLiteHelper.COLUMN_TRANSACTION_USERS_SDT + " = ?";
-                cursor = db.rawQuery(query, new String[]{phoneUser});
+    private void getMostAndLeastFrequentTransactionTypes(String phoneUser, int month, String year) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = null;
 
-                if (cursor != null && cursor.moveToFirst()) {
-                    total = cursor.getDouble(0);
-                }
-            } catch (Exception e) {
-                Log.e("mainScreen", "Lỗi khi tính tổng giao dịch", e);
-            } finally {
-                if (cursor != null) cursor.close();
-                if (db != null) db.close();
+        try {
+            String query = "SELECT " + SQLiteHelper.COLUMN_TRANSACTION_TYPE + ", SUM(" + SQLiteHelper.COLUMN_TRANSACTION_AMOUNT + ") as total_amount " +
+                    "FROM " + SQLiteHelper.TB_Trans + " " +
+                    "WHERE " + SQLiteHelper.COLUMN_TRANSACTION_USERS_SDT + " = ? " +
+                    "AND strftime('%m', " + SQLiteHelper.COLUMN_TRANSACTION_DATE + ") = ? " +
+                    "AND strftime('%Y', " + SQLiteHelper.COLUMN_TRANSACTION_DATE + ") = ? " +
+                    "GROUP BY " + SQLiteHelper.COLUMN_TRANSACTION_TYPE;
+
+            String monthString = String.format("%02d", month);
+            cursor = db.rawQuery(query, new String[]{phoneUser, monthString, year});
+
+            String mostFrequentType = "";
+            String leastFrequentType = "";
+            double mostFrequentAmount = 0;
+            double leastFrequentAmount = Double.MAX_VALUE;
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    @SuppressLint("Range") String transactionType = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_TRANSACTION_TYPE));
+                    @SuppressLint("Range") double totalAmount = cursor.getDouble(cursor.getColumnIndex("total_amount"));
+
+                    if (totalAmount > mostFrequentAmount) {
+                        mostFrequentAmount = totalAmount;
+                        mostFrequentType = transactionType;
+                    }
+
+                    if (totalAmount < leastFrequentAmount) {
+                        leastFrequentAmount = totalAmount;
+                        leastFrequentType = transactionType;
+                    }
+                } while (cursor.moveToNext());
             }
-            return total;
+
+            TextView viewThuMax = findViewById(R.id.viewChiNhieu);
+            TextView viewThuMin = findViewById(R.id.viewChiIt);
+
+            viewThuMax.setText("Chi nhiều nhất: " + (mostFrequentType.isEmpty() ? "Không có dữ liệu" : mostFrequentType ));
+            viewThuMin.setText("Chi ít nhất: " + (leastFrequentType.isEmpty() ? "Không có dữ liệu" : leastFrequentType ));
+
+        } catch (Exception e) {
+            Log.e("ChartJs", "Lỗi khi tính toán loại giao dịch cao nhất và thấp nhất", e);
+        } finally {
+            if (cursor != null) cursor.close();
+            if (db != null) db.close();
         }
     }
+}

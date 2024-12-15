@@ -12,7 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp"
         android:orientation="vertical"
         android:gravity="center">
@@ -20,7 +20,7 @@
         android:id="@+id/profileImage"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:src="@drawable/ht2"
+        android:background="@drawable/incon_account_signup"
         android:scaleType="centerCrop"
         app:civ_border_color="@color/black"
         app:civ_border_width="4dp"
@@ -32,7 +32,7 @@
         android:id="@+id/tvUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:text="Hiếu cuto"
         android:textSize="30sp"
         android:textStyle="bold"

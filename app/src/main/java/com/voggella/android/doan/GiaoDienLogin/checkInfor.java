@@ -58,10 +58,6 @@ public class checkInfor  extends AppCompatActivity {
 
             //Thong bao
             Toast.makeText(this, "Lưu thành công!", Toast.LENGTH_SHORT).show();
-            if (dbHelper.isUserExists(phone)) {
-                Toast.makeText(this, "Số điện thoại đã tồn tại!", Toast.LENGTH_SHORT).show();
-                return;
-            }
             if (radioGender.getCheckedRadioButtonId() == -1) {
                 Toast.makeText(this, "Vui lòng chọn giới tính!", Toast.LENGTH_SHORT).show();
                 return;

@@ -1,5 +1,6 @@
 package com.voggella.android.doan.mainHome;
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -34,7 +35,11 @@ public class mainScreen extends AppCompatActivity {
     private List<Object> itemList; // Danh sách chứa cả Transaction và Budget
     private SQLiteHelper dbHelper;
     private String phoneUser;
+    private String userName;
     private ActivityResultLauncher<Intent> addTransactionLauncher;
+    private TextView textNotificationCount;
+    private ImageView imageNoti;
+    private int notificationCount = 0; //Bien dem thong bao
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,15 +48,19 @@ public class mainScreen extends AppCompatActivity {
 
         dbHelper = new SQLiteHelper(this);
 
+        // Khởi tạo ImageView và TextView
         ImageView btnDashboard = findViewById(R.id.btn_dashboard);
         ImageView btnAdd = findViewById(R.id.btn_add);
         ImageView btnCate = findViewById(R.id.btn_cate);
         ImageView btnProfile = findViewById(R.id.btn_profile);
+        textNotificationCount = findViewById(R.id.textNotificationCount);
+        imageNoti = findViewById(R.id.imageNoti);
 
         // Gắn sự kiện onClick cho từng nút
         btnDashboard.setOnClickListener(v -> {
             Intent intent = new Intent(this, ChartJs.class);
             intent.putExtra("USERS_SDT",phoneUser);
+            intent.putExtra("USER_FULL_NAME",userName);
             startActivity(intent);
         });
 
@@ -63,11 +72,21 @@ public class mainScreen extends AppCompatActivity {
 
         btnProfile.setOnClickListener(v -> {
             Intent intent = new Intent(this, account_Setting.class);
+            intent.putExtra("USERS_SDT",phoneUser);
+
             startActivity(intent);
         });
+         imageNoti.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 showNotificationDialog();
+                 notificationCount = 0;
+                 textNotificationCount.setText(String.valueOf(notificationCount));
+             }
+         });
 
         // Nhận thông tin người dùng từ Intent
-        String userFullName = getIntent().getStringExtra("USER_FULL_NAME");
+        userName = getIntent().getStringExtra("USER_FULL_NAME");
          phoneUser = getIntent().getStringExtra("USERS_SDT");
         if (phoneUser == null || phoneUser.isEmpty()) {
             Log.e("mainScreen", "Số điện thoại không hợp lệ.");
@@ -166,7 +185,6 @@ public class mainScreen extends AppCompatActivity {
     // Phương thức load dữ liệu cả Transaction và Budget
     private void loadData(String phoneUser) {
         itemList = new ArrayList<>();
-
         // Load Transaction data
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String[] transactionColumns = {
@@ -174,7 +192,9 @@ public class mainScreen extends AppCompatActivity {
                 SQLiteHelper.COLUMN_TRANSACTION_AMOUNT,
                 SQLiteHelper.COLUMN_TRANSACTION_DATE
         };
-        Cursor transactionCursor = db.query(SQLiteHelper.TB_Trans, transactionColumns, SQLiteHelper.COLUMN_TRANSACTION_USERS_SDT + " = ?", new String[]{phoneUser}, null, null, null);
+        // Thêm điều kiện id != 1
+        String transactionSelection = SQLiteHelper.COLUMN_TRANSACTION_USERS_SDT + " = ? AND " + SQLiteHelper.COLUMN_TRANSACTION_ID + " != ?";
+        Cursor transactionCursor = db.query(SQLiteHelper.TB_Trans, transactionColumns, transactionSelection, new String[]{phoneUser, "1"}, null, null, null);
 
         if (transactionCursor != null) {
             while (transactionCursor.moveToNext()) {
@@ -183,6 +203,9 @@ public class mainScreen extends AppCompatActivity {
                 @SuppressLint("Range") String date = transactionCursor.getString(transactionCursor.getColumnIndex(SQLiteHelper.COLUMN_TRANSACTION_DATE));
 
                 itemList.add(new Transaction(type, amount, date));
+                //Tang bien dem
+                notificationCount++; // Tăng số đếm
+                textNotificationCount.setText(String.valueOf(notificationCount));
             }
             transactionCursor.close();
         }
@@ -192,7 +215,9 @@ public class mainScreen extends AppCompatActivity {
                 SQLiteHelper.COLUMN_BUDGET_DATA,
                 SQLiteHelper.COLUMN_BUDGET_DATE
         };
-        Cursor budgetCursor = db.query(SQLiteHelper.TB_Budget, budgetColumns, SQLiteHelper.COLUMN_BUDGET_USERS_SDT+ " = ?", new String[]{phoneUser}, null, null, null);
+        // Thêm điều kiện id != 1
+        String budgetSelection = SQLiteHelper.COLUMN_BUDGET_USERS_SDT + " = ? AND " + SQLiteHelper.COLUMN_BUDGET_ID + " != ?";
+        Cursor budgetCursor = db.query(SQLiteHelper.TB_Budget, budgetColumns, budgetSelection, new String[]{phoneUser, "1"}, null, null, null);
 
         if (budgetCursor != null) {
             while (budgetCursor.moveToNext()) {
@@ -200,9 +225,13 @@ public class mainScreen extends AppCompatActivity {
                 @SuppressLint("Range") String date = budgetCursor.getString(budgetCursor.getColumnIndex(SQLiteHelper.COLUMN_BUDGET_DATE));
 
                 itemList.add(new Budget(amount, date));
+                //Tang bien dem
+                notificationCount++; // Tăng số đếm
+                textNotificationCount.setText(String.valueOf(notificationCount));
             }
             budgetCursor.close();
         }
+
         db.close();
 
         // Cập nhật RecyclerView với adapter MultiTypeAdapter
@@ -212,11 +241,10 @@ public class mainScreen extends AppCompatActivity {
         } else {
             multiTypeAdapter.notifyDataSetChanged();
         }
-
         // Cập nhật lại ViewBudget
         updateViewBudget(phoneUser);
-    }
 
+    }
     // Phương thức cập nhật ViewBudget
     private void updateViewBudget(String phoneUser) {
         double totalBudget = getTotalBudget(phoneUser); // Tổng tiền trong bảng Budget
@@ -227,7 +255,7 @@ public class mainScreen extends AppCompatActivity {
         double remainingBalance = totalBudget - totalTransaction;
 
         // Hiển thị số dư còn lại
-        String balanceText = "Số dư " + remainingBalance + " vnd";
+        String balanceText = "Số dư: " + remainingBalance + " vnd";
         viewBudget.setText(balanceText);
     }
 
@@ -287,6 +315,27 @@ public class mainScreen extends AppCompatActivity {
             return cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_USER_NAME));
         }
         return null;
+    }
+    // Phương thức hiển thị Dialog khi nhấn vào ImageView
+    private void showNotificationDialog() {
+        // Tạo một thông báo AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Thông báo");
+        String notice = "Bạn vừa cập nhật " + notificationCount +" giao dịch";
+        builder.setMessage(notice);
+        builder.setCancelable(false);  // Không thể thoát bằng cách nhấn ngoài
+
+        // Thêm nút "OK" để đóng Dialog
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Đóng Dialog khi người dùng nhấn OK
+                dialog.dismiss();
+            }
+        });
+
+        // Hiển thị Dialog
+        builder.create().show();
     }
 
 }

@@ -13,8 +13,9 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="BUDGET"
-        android:textColor="#32CD32   "
+        android:textColor="#008000"
         android:textSize="20sp"
+        android:textStyle="bold"
         android:gravity="center" />
 
     <!-- TextView for budget amount -->
@@ -24,9 +25,10 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Amount"
-        android:textColor="#32CD32"
+        android:textColor="#008000"
         android:textSize="20sp"
         android:gravity="center"
+        android:textStyle="bold"
         android:paddingStart="9dp"/>
 
     <!-- TextView for budget date -->
@@ -36,8 +38,9 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Date"
-        android:textColor="#32CD32"
+        android:textColor="#008000"
         android:textSize="20sp"
+        android:textStyle="bold"
         android:gravity="center"
         android:paddingStart="9dp"/>
 
