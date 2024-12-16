@@ -1,8 +1,5 @@
-package com.voggella.android.doan.Database;
-import  com.voggella.android.doan.Database.SQLiteHelper;
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
+package com.voggella.android.doan.Database_Adapter;
+
 public class Budget {
     private double amount;
     private String date;

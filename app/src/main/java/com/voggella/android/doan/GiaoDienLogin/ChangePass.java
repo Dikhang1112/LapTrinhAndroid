@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.voggella.android.doan.Database.SQLiteHelper;
+import com.voggella.android.doan.Database_Adapter.SQLiteHelper;
 import com.voggella.android.doan.R;
 
 public class ChangePass extends AppCompatActivity {

@@ -1,5 +1,4 @@
 package com.voggella.android.doan.GiaoDienLogin;
-import com.voggella.android.doan.Database.Budget;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -11,7 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import com.voggella.android.doan.Database.SQLiteHelper;
+import com.voggella.android.doan.Database_Adapter.SQLiteHelper;
 import com.voggella.android.doan.R;
 
 public class checkInfor  extends AppCompatActivity {

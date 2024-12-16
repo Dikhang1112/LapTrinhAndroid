@@ -1,4 +1,4 @@
-package com.voggella.android.doan.Database;
+package com.voggella.android.doan.Database_Adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

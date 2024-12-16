@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme -->
+    <style name="Theme.App" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="colorPrimary">@color/background_card</item>
+        <item name="colorPrimaryDark">@color/background_header</item>
+        <item name="colorAccent">@color/background_card</item>
+        <item name="android:windowBackground">@color/background_main</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:statusBarColor">@color/background_header</item>
+        <item name="android:navigationBarColor">@color/background_header</item>
+        <item name="colorPrimaryVariant">@color/background_header</item>
+        <item name="colorSecondary">@color/background_card</item>
+        <item name="colorSecondaryVariant">@color/background_card</item>
+    </style>
+
+    <!-- Dark theme -->
+    <style name="Theme.App.Dark" parent="Theme.MaterialComponents.DayNight">
+        <item name="colorPrimary">@color/background_card</item>
+        <item name="colorPrimaryDark">@color/background_header</item>
+        <item name="colorAccent">@color/background_card</item>
+        <item name="android:windowBackground">@color/background_main</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:statusBarColor">@color/background_header</item>
+        <item name="android:navigationBarColor">@color/background_header</item>
+        <item name="colorPrimaryVariant">@color/background_header</item>
+        <item name="colorSecondary">@color/background_card</item>
+        <item name="colorSecondaryVariant">@color/background_card</item>
+    </style>
+
+    <style name="ButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="android:background">@color/button_background</item>
+        <item name="android:textColor">@color/button_text</item>
+    </style>
+
+    <style name="ListViewStyle" parent="Widget.AppCompat.ListView">
+        <item name="android:background">@color/list_background</item>
+        <item name="android:divider">@color/list_divider</item>
+        <item name="android:dividerHeight">1dp</item>
+    </style>
+
+    <style name="WindowAnimationFade">
+        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+    </style>
+</resources>

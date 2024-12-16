@@ -1,5 +1,5 @@
 // File: model/Transaction.java
-package com.voggella.android.doan.Database;
+package com.voggella.android.doan.Database_Adapter;
 
 public class Transaction {
     private String type;

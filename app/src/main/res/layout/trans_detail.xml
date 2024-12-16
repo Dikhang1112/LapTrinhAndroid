@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
     android:background="@drawable/back_shopiing">
 
     <!-- Tiêu đề -->
@@ -42,22 +41,14 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewTransactions"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="300dp"
         android:layout_weight="1"
         android:background="@color/white"
-        android:layout_marginBottom="16dp"/>
-    <Button
-        android:id="@+id/btnBackMain"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
-        android:padding="10dp"
-        android:background="@drawable/round_corner"
-        android:backgroundTint="@color/white"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:textSize="35dp"
+        />
+    <com.voggella.android.doan.mainHome.FooterLayout
+        android:id="@+id/footerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Home" />
-
+        android:layout_marginTop="10dp"
+        />
 </LinearLayout>

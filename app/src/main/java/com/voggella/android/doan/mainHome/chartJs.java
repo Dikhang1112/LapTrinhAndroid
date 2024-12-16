@@ -1,6 +1,7 @@
 package com.voggella.android.doan.mainHome;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -20,19 +21,21 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.voggella.android.doan.Database.SQLiteHelper;
+import com.voggella.android.doan.Database_Adapter.SQLiteHelper;
 import com.voggella.android.doan.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
 
-public class ChartJs extends AppCompatActivity {
+public class chartJs extends AppCompatActivity {
 
     private BarChart barChart;
     private String phoneUser;
+    private String userName;
     private SQLiteHelper dbHelper;
     private Spinner monthSpinner, yearSpinner;
+    private FooterLayout footerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +48,15 @@ public class ChartJs extends AppCompatActivity {
         // Khởi tạo BarChart
         barChart = findViewById(R.id.barChart);
 
-        // Lấy số điện thoại của người dùng từ Intent
-        phoneUser = getIntent().getStringExtra("USERS_SDT");
+        // Nhận dữ liệu từ Intent
+        Intent intent = getIntent();
+         phoneUser = intent.getStringExtra("USERS_SDT");
+         userName = intent.getStringExtra("USER_FULL_NAME");
+
+        // Khởi tạo FooterLayout và truyền dữ liệu vào
+        footerLayout = findViewById(R.id.footerLayout);
+        footerLayout.setUserData(phoneUser, userName);
+
 
         if (phoneUser == null) {
             Toast.makeText(this, "Không tìm thấy thông tin người dùng!", Toast.LENGTH_SHORT).show();

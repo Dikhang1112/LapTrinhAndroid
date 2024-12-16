@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/login_background">
+
+    <!-- Profile Icon -->
+    <ImageView
+        android:id="@+id/imgProfile"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/admin_ava"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp" />
+
+    <!-- Name Input -->
+    <EditText
+        android:id="@+id/etAdminName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imgProfile"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="25dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:hint="Admin Name"
+        android:textColorHint="#FFFFFF"
+        android:drawableStart="@drawable/avatar_homescreen"
+        android:drawablePadding="8dp"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:textSize="30dp"
+        android:backgroundTint="#FFFFFF"
+        android:inputType="textEmailAddress" />
+
+    <!-- Password Input -->
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etAdminName"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:hint="Password"
+        android:textColorHint="#FFFFFF"
+        android:drawableStart="@drawable/icon_key"
+        android:drawablePadding="8dp"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#FFFFFF"
+        android:textStyle="bold"
+        android:textSize="30dp"
+        android:inputType="textPassword" />
+
+    <LinearLayout
+        android:id="@+id/llRememberForgot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etPassword"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+    </LinearLayout>
+
+    <!-- Login Button -->
+    <Button
+        android:id="@+id/btnAdminLogin"
+        android:layout_width="200dp"
+        android:layout_height="80dp"
+        android:layout_below="@id/llRememberForgot"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="52dp"
+        android:layout_marginEnd="107dp"
+        android:background="@drawable/button_background"
+        android:text="Login"
+        android:textColor="#FFFFFF"
+        android:textSize="35sp" />
+
+</RelativeLayout>

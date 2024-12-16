@@ -1,87 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:background="@drawable/back_account"
     android:gravity="center"
-    android:background="@drawable/back_account">
+    android:orientation="vertical">
 
     <!-- Ảnh đại diện -->
-    <LinearLayout
-        android:layout_width="match_parent"
+    <FrameLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
-        android:orientation="vertical"
-        android:gravity="center">
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profileImage"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:background="@drawable/incon_account_signup"
-        android:scaleType="centerCrop"
-        app:civ_border_color="@color/black"
-        app:civ_border_width="4dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-    <!-- Tên tài khoản -->
+        android:layout_gravity="center">
+
+        <!-- CircleImageView chính -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profileImage"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/incon_account_signup"
+            app:civ_border_color="@color/black"
+            app:civ_border_width="4dp" />
+
+        <!-- Vương miện ở góc -->
+        <ImageView
+            android:id="@+id/crownImage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginTop="-10dp"
+            android:layout_marginEnd="10dp"
+            android:background= "#F0E68C   "
+            android:src="@drawable/icon_vip" />
+
+    </FrameLayout>
     <TextView
         android:id="@+id/tvUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:text="Hiếu cuto"
-        android:textSize="30sp"
-        android:textStyle="bold"
         android:textColor="@color/white"
-        android:layout_gravity="center" />
-    </LinearLayout>
-    <!-- Tùy chọn: User VIP -->
+        android:textSize="30sp"
+        android:textStyle="bold" />
+    <!--    Hien thi sdt-->
+    <TextView
+        android:id="@+id/tvViewSdt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/textview_boder"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp"
+        android:padding="16dp"
+        android:text = "Phone User"
+        android:textColor="#000"
+        android:textSize="30sp" />
+    <TextView
+        android:id="@+id/tvViewSex"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/textview_boder"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp"
+        android:padding="16dp"
+        android:text = "Sex"
+        android:textColor="#000"
+        android:textSize="30sp" />
 
-        <TextView
-            android:id="@+id/tvUserVip"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/textview_boder"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:padding="16dp"
-            android:text="User VIP"
-            android:textColor="#000"
-            android:textSize="30sp" />
-
-        <!-- Tùy chọn: Admin -->
-        <TextView
-            android:id="@+id/tvAdmin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/textview_boder"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:padding="16dp"
-            android:text="Admin"
-            android:textColor="#000"
-            android:textSize="30sp" />
-
-        <!-- Tùy chọn: Theme -->
-        <TextView
-            android:id="@+id/tvTheme"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/textview_boder"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:padding="16dp"
-            android:text="Theme"
-            android:textColor="#000"
-            android:textSize="30sp" />
-        <!-- Tùy chọn: Log Out -->
+<!--        Ngay sinh-->
+    <TextView
+        android:id="@+id/tvViewBirth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/textview_boder"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:layout_marginTop="5dp"
+        android:padding="16dp"
+        android:text = "User Birthday"
+        android:textColor="#000"
+        android:textSize="30sp" />
+    <!-- Tùy chọn: Log Out -->
     <TextView
         android:id="@+id/tvLogout"
         android:layout_width="match_parent"
@@ -90,20 +96,18 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center_vertical"
+        android:layout_marginTop="8dp"
         android:padding="16dp"
         android:text="Log Out"
         android:textColor="#000"
-        android:textSize="30sp" />
-    <TextView
-        android:id="@+id/tvHome"
+        android:textSize="30sp"
+        android:drawableStart="@drawable/icon_logout"
+        android:drawablePadding="8dp" />
+
+    <com.voggella.android.doan.mainHome.FooterLayout
+        android:id="@+id/footerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/textview_boder"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:padding="16dp"
-        android:text="Home"
-        android:textColor="#000"
-        android:textSize="30sp" />
+        android:layout_marginTop="10dp"
+        />
 </LinearLayout>

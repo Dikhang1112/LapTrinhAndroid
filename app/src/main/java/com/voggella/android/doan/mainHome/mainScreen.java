@@ -13,21 +13,23 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.voggella.android.doan.Database.MultiTypeAdapter;
-import com.voggella.android.doan.Database.SQLiteHelper;
+import com.voggella.android.doan.Database_Adapter.MultiTypeAdapter;
+import com.voggella.android.doan.Database_Adapter.SQLiteHelper;
 import com.voggella.android.doan.R;
-import com.voggella.android.doan.Database.Transaction; // Import Transaction
-import com.voggella.android.doan.Database.Budget; // Import Budget
+import com.voggella.android.doan.Database_Adapter.Transaction; // Import Transaction
+import com.voggella.android.doan.Database_Adapter.Budget; // Import Budget
 import java.util.ArrayList;
 import java.util.List;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatDelegate;
 
 public class mainScreen extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -40,54 +42,63 @@ public class mainScreen extends AppCompatActivity {
     private TextView textNotificationCount;
     private ImageView imageNoti;
     private int notificationCount = 0; //Bien dem thong bao
+    private Switch switchDarkMode;
+    private boolean isVipUser = false;
+    private FooterLayout footerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Khởi tạo database trước để có thể kiểm tra VIP
+        dbHelper = new SQLiteHelper(this);
+        // Lấy thông tin user và kiểm tra VIP
+        phoneUser = getIntent().getStringExtra("USERS_SDT");
+        userName = getIntent().getStringExtra("USER_FULL_NAME");
+        if (phoneUser != null) {
+            isVipUser = checkIsUserVip(phoneUser);
+            // Áp dụng theme dựa trên trạng thái VIP và darkmode
+            if (isVipUser) {
+                boolean savedDarkMode = getDarkModeState();
+                AppCompatDelegate.setDefaultNightMode(
+                        savedDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
+                );
+            } else {
+                // User thường luôn ở light mode
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+        }
+
         setContentView(R.layout.main_screen);
 
-        dbHelper = new SQLiteHelper(this);
-
         // Khởi tạo ImageView và TextView
-        ImageView btnDashboard = findViewById(R.id.btn_dashboard);
-        ImageView btnAdd = findViewById(R.id.btn_add);
-        ImageView btnCate = findViewById(R.id.btn_cate);
-        ImageView btnProfile = findViewById(R.id.btn_profile);
+        footerLayout = findViewById(R.id.footerLayout);
         textNotificationCount = findViewById(R.id.textNotificationCount);
         imageNoti = findViewById(R.id.imageNoti);
+        switchDarkMode = findViewById(R.id.switchDarkMode);
 
-        // Gắn sự kiện onClick cho từng nút
-        btnDashboard.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ChartJs.class);
-            intent.putExtra("USERS_SDT",phoneUser);
-            intent.putExtra("USER_FULL_NAME",userName);
-            startActivity(intent);
+        //Lay sdt va ho ten cho footer
+        footerLayout.setUserData(phoneUser,userName);
+
+        // Kiểm tra quyền VIP ngay sau khi lấy được phoneUser
+        phoneUser = getIntent().getStringExtra("USERS_SDT");
+        if (phoneUser != null) {
+            checkVipStatus();
+        } else {
+            Log.e("MainScreen", "phoneUser is null");
+        }
+        imageNoti.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showNotificationDialog();
+                notificationCount = 0;
+                textNotificationCount.setText(String.valueOf(notificationCount));
+            }
         });
-
-        btnCate.setOnClickListener(v -> {
-            Intent intent = new Intent(this, trans_Detail.class);
-            intent.putExtra("USERS_SDT",phoneUser);
-            startActivity(intent);
-        });
-
-        btnProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(this, account_Setting.class);
-            intent.putExtra("USERS_SDT",phoneUser);
-
-            startActivity(intent);
-        });
-         imageNoti.setOnClickListener(new View.OnClickListener() {
-             @Override
-             public void onClick(View v) {
-                 showNotificationDialog();
-                 notificationCount = 0;
-                 textNotificationCount.setText(String.valueOf(notificationCount));
-             }
-         });
 
         // Nhận thông tin người dùng từ Intent
         userName = getIntent().getStringExtra("USER_FULL_NAME");
-         phoneUser = getIntent().getStringExtra("USERS_SDT");
+        phoneUser = getIntent().getStringExtra("USERS_SDT");
         if (phoneUser == null || phoneUser.isEmpty()) {
             Log.e("mainScreen", "Số điện thoại không hợp lệ.");
             Toast.makeText(this, "Không nhận được thông tin người dùng!", Toast.LENGTH_SHORT).show();
@@ -105,12 +116,6 @@ public class mainScreen extends AppCompatActivity {
                     }
                 }
         );
-        btnAdd.setOnClickListener(v -> {
-            Intent intentAdd = new Intent(mainScreen.this, add_Trans.class);
-            intentAdd.putExtra("USERS_SDT", phoneUser);
-           startActivity(intentAdd);
-           finish();
-        });
 
         // Lấy TextView name
         TextView viewName = findViewById(R.id.ViewName);
@@ -174,7 +179,90 @@ public class mainScreen extends AppCompatActivity {
                 recreate();
             });
         });
+
+        // Kiểm tra quyền VIP
+        checkVipStatus();
+
+        // Xử lý sự kiện thay đổi darkmode
+        setupDarkModeSwitch();
     }
+
+    private void checkVipStatus() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Log.d("MainScreen", "Checking VIP status for user: " + phoneUser);
+
+        try {
+            Cursor cursor = db.query(
+                    SQLiteHelper.TB_USERS,
+                    new String[]{SQLiteHelper.COLUMN_USER_TYPE},
+                    SQLiteHelper.COLUMN_USER_SDT + "=?",
+                    new String[]{phoneUser},
+                    null, null, null
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                @SuppressLint("Range")
+                int vipStatus = cursor.getInt(cursor.getColumnIndex(SQLiteHelper.COLUMN_USER_TYPE));
+                isVipUser = (vipStatus == 1);
+                Log.d("MainScreen", "User VIP status: " + isVipUser);
+
+                runOnUiThread(() -> {
+                    if (isVipUser) {
+                        switchDarkMode.setVisibility(View.VISIBLE);
+                    } else {
+                        switchDarkMode.setVisibility(View.GONE);
+                        // Đảm bảo user thường luôn ở light mode
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    }
+                });
+
+                cursor.close();
+            }
+        } catch (Exception e) {
+            Log.e("MainScreen", "Error checking VIP status: " + e.getMessage());
+        }
+    }
+
+    private void setupDarkModeSwitch() {
+        if (isVipUser) {
+            switchDarkMode.setVisibility(View.VISIBLE);
+            boolean savedDarkMode = getDarkModeState();
+            switchDarkMode.setChecked(savedDarkMode);
+
+            switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                try {
+                    saveDarkModeState(isChecked);
+                    if (isChecked) {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    } else {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    }
+                    // Recreate activity để áp dụng theme mới
+                    recreate();
+                } catch (Exception e) {
+                    Log.e("MainScreen", "Error changing theme: " + e.getMessage());
+                }
+            });
+        } else {
+            switchDarkMode.setVisibility(View.GONE);
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+    }
+
+    // Thêm phương thức lưu trạng thái darkmode
+    private void saveDarkModeState(boolean isDarkMode) {
+        getSharedPreferences("app_settings", MODE_PRIVATE)
+                .edit()
+                .putBoolean("dark_mode_" + phoneUser, isDarkMode)
+                .apply();
+    }
+
+    // Thêm phương thức đọc trạng thái darkmode
+    private boolean getDarkModeState() {
+        return getSharedPreferences("app_settings", MODE_PRIVATE)
+                .getBoolean("dark_mode_" + phoneUser, false);
+    }
+
     private void refreshData() {
         if (itemList != null && multiTypeAdapter != null) {
             itemList.clear();
@@ -192,8 +280,10 @@ public class mainScreen extends AppCompatActivity {
                 SQLiteHelper.COLUMN_TRANSACTION_AMOUNT,
                 SQLiteHelper.COLUMN_TRANSACTION_DATE
         };
-        // Thêm điều kiện id != 1
-        String transactionSelection = SQLiteHelper.COLUMN_TRANSACTION_USERS_SDT + " = ? AND " + SQLiteHelper.COLUMN_TRANSACTION_ID + " != ?";
+        // Thêm điều kiện Transaction Amount khác 0
+        String transactionSelection = SQLiteHelper.COLUMN_TRANSACTION_USERS_SDT + " = ? AND " +
+                SQLiteHelper.COLUMN_TRANSACTION_ID + " != ? AND " +
+                SQLiteHelper.COLUMN_TRANSACTION_AMOUNT + " != 0";
         Cursor transactionCursor = db.query(SQLiteHelper.TB_Trans, transactionColumns, transactionSelection, new String[]{phoneUser, "1"}, null, null, null);
 
         if (transactionCursor != null) {
@@ -203,7 +293,6 @@ public class mainScreen extends AppCompatActivity {
                 @SuppressLint("Range") String date = transactionCursor.getString(transactionCursor.getColumnIndex(SQLiteHelper.COLUMN_TRANSACTION_DATE));
 
                 itemList.add(new Transaction(type, amount, date));
-                //Tang bien dem
                 notificationCount++; // Tăng số đếm
                 textNotificationCount.setText(String.valueOf(notificationCount));
             }
@@ -215,8 +304,10 @@ public class mainScreen extends AppCompatActivity {
                 SQLiteHelper.COLUMN_BUDGET_DATA,
                 SQLiteHelper.COLUMN_BUDGET_DATE
         };
-        // Thêm điều kiện id != 1
-        String budgetSelection = SQLiteHelper.COLUMN_BUDGET_USERS_SDT + " = ? AND " + SQLiteHelper.COLUMN_BUDGET_ID + " != ?";
+        // Thêm điều kiện Budget Data khác 0
+        String budgetSelection = SQLiteHelper.COLUMN_BUDGET_USERS_SDT + " = ? AND " +
+                SQLiteHelper.COLUMN_BUDGET_ID + " != ? AND " +
+                SQLiteHelper.COLUMN_BUDGET_DATA + " != 0";
         Cursor budgetCursor = db.query(SQLiteHelper.TB_Budget, budgetColumns, budgetSelection, new String[]{phoneUser, "1"}, null, null, null);
 
         if (budgetCursor != null) {
@@ -225,7 +316,6 @@ public class mainScreen extends AppCompatActivity {
                 @SuppressLint("Range") String date = budgetCursor.getString(budgetCursor.getColumnIndex(SQLiteHelper.COLUMN_BUDGET_DATE));
 
                 itemList.add(new Budget(amount, date));
-                //Tang bien dem
                 notificationCount++; // Tăng số đếm
                 textNotificationCount.setText(String.valueOf(notificationCount));
             }
@@ -243,8 +333,8 @@ public class mainScreen extends AppCompatActivity {
         }
         // Cập nhật lại ViewBudget
         updateViewBudget(phoneUser);
-
     }
+
     // Phương thức cập nhật ViewBudget
     private void updateViewBudget(String phoneUser) {
         double totalBudget = getTotalBudget(phoneUser); // Tổng tiền trong bảng Budget
@@ -336,6 +426,47 @@ public class mainScreen extends AppCompatActivity {
 
         // Hiển thị Dialog
         builder.create().show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isVipUser) {
+            // Đồng bộ trạng thái switch với theme hiện tại
+            boolean isDarkMode = getDarkModeState();
+            switchDarkMode.setChecked(isDarkMode);
+        }
+    }
+
+    // Thêm phương thức này để xử lý việc chuyển đổi theme
+    @Override
+    public void onNightModeChanged(int mode) {
+        super.onNightModeChanged(mode);
+        recreate();
+    }
+
+    // Thêm phương thức kiểm tra VIP
+    private boolean checkIsUserVip(String phone) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        try {
+            Cursor cursor = db.query(
+                    SQLiteHelper.TB_USERS,
+                    new String[]{SQLiteHelper.COLUMN_USER_TYPE},
+                    SQLiteHelper.COLUMN_USER_SDT + "=?",
+                    new String[]{phone},
+                    null, null, null
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                @SuppressLint("Range")
+                int vipStatus = cursor.getInt(cursor.getColumnIndex(SQLiteHelper.COLUMN_USER_TYPE));
+                cursor.close();
+                return vipStatus == 1;
+            }
+        } catch (Exception e) {
+            Log.e("MainScreen", "Error checking VIP status: " + e.getMessage());
+        }
+        return false;
     }
 
 }

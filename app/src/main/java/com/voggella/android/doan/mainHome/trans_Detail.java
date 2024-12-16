@@ -1,5 +1,6 @@
 package com.voggella.android.doan.mainHome;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,16 +13,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.voggella.android.doan.Database.SQLiteHelper;
+import com.voggella.android.doan.Database_Adapter.SQLiteHelper;
 import com.voggella.android.doan.R;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 public class trans_Detail extends AppCompatActivity {
 
     private SQLiteHelper dbHelper; // Giả sử bạn đã định nghĩa SQLiteHelper
-    private String phoneUser;      // Số điện thoại người dùng
+    private FooterLayout footerLayout;
+    private String phoneUser;
+    private String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,10 +35,18 @@ public class trans_Detail extends AppCompatActivity {
 
         // Khởi tạo UI
         Spinner spinnerTransac = findViewById(R.id.spinnerTransac);
-        Button btnBackHome = findViewById(R.id.btnBackMain);
+
 
         // Nhận số điện thoại người dùng từ Intent
-        phoneUser = getIntent().getStringExtra("USERS_SDT");
+        // Nhận dữ liệu từ Intent
+        Intent intent = getIntent();
+         phoneUser = intent.getStringExtra("USERS_SDT");
+         userName = intent.getStringExtra("USER_FULL_NAME");
+
+        // Khởi tạo FooterLayout và truyền dữ liệu vào
+        footerLayout = findViewById(R.id.footerLayout);
+        footerLayout.setUserData(phoneUser, userName);
+
         if (phoneUser == null || phoneUser.isEmpty()) {
             Log.e("mainScreen", "Số điện thoại không hợp lệ.");
             Toast.makeText(this, "Không nhận được thông tin người dùng!", Toast.LENGTH_SHORT).show();
@@ -85,8 +95,6 @@ public class trans_Detail extends AppCompatActivity {
 //            }
 //        });
 
-        // Sự kiện khi nhấn nút quay lại
-        btnBackHome.setOnClickListener(v -> finish());
     }
     private void updateRecyclerView(List<TransactionShow> transactions) {
         RecyclerView recyclerView = findViewById(R.id.recyclerViewTransactions);

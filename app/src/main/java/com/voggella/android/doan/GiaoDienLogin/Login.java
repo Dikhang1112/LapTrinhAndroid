@@ -18,6 +18,7 @@ public class Login extends AppCompatActivity {
         //Link button with id
         Button btnSignin = findViewById(R.id.btnSignIn);
         Button btnSignup = findViewById(R.id.btnSignUp);
+        Button btnAdmin = findViewById(R.id.btnAdmin);
 
         //Nhay qua trang sign in
 
@@ -33,6 +34,13 @@ btnSignup.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View view) {
         Intent intent = new Intent(Login.this, SignUp.class);
+        startActivity(intent);
+    }
+});
+btnAdmin.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(Login.this, AdminLogin.class);
         startActivity(intent);
     }
 });

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
@@ -15,26 +14,29 @@
         android:theme="@style/Theme.DoAn"
         tools:targetApi="31">
 
-        <activity android:name=".GiaoDienLogin.SignIn"></activity>
-        <activity android:name=".GiaoDienLogin.SignUp"></activity>
-        <activity android:name=".GiaoDienLogin.ChangePass"></activity>
-        <activity android:name=".GiaoDienLogin.ScreenWait"></activity>
-        <activity android:name=".GiaoDienLogin.checkInfor"></activity>
-        <activity android:name=".mainHome.mainScreen"></activity>
-        <activity android:name=".mainHome.ChartJs"></activity>
-        <activity android:name=".mainHome.add_Trans"></activity>
-        <activity android:name=".mainHome.trans_Detail"></activity>
-        <activity android:name=".mainHome.account_Setting"></activity>
+        <activity android:name=".GiaoDienLogin.SignIn" />
+        <activity android:name=".GiaoDienLogin.SignUp" />
+        <activity android:name=".GiaoDienLogin.ChangePass" />
+        <activity android:name=".GiaoDienLogin.ScreenWait" />
+        <activity android:name=".GiaoDienLogin.checkInfor" />
+        <activity android:name=".GiaoDienLogin.AdminLogin" />
+        <activity android:name=".mainHome.mainScreen" />
+        <activity android:name=".mainHome.chartJs" />
+        <activity android:name=".mainHome.add_Trans" />
+        <activity android:name=".mainHome.trans_Detail" />
+        <activity android:name=".mainHome.account_Setting" />
+        <activity android:name=".GiaoDienLogin.AdminManagementActivity"></activity>
 
-
-        <activity android:name = ".GiaoDienLogin.Login"
-                android:exported="true">
+        <activity android:name=".GiaoDienLogin.Login"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
+
+    <!-- Quyền cần thiết -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />

@@ -40,17 +40,17 @@
         android:id="@+id/barChart"
         android:layout_marginTop="30dp"
         android:layout_width="match_parent"
-        android:layout_height="350dp" />
+        android:layout_height="300dp" />
 
     <!-- Section for statistics -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="20dp"
         android:background="@drawable/textview_boder"
         android:entries="@array/months_array"
-        android:padding="15dp">
+        android:padding="10dp">
 
         <!-- TextView for Total Income and Total Expense -->
         <LinearLayout
@@ -64,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Tổng thu: 0"
-                android:textSize="20sp"
+                android:textSize="15sp"
                 android:textColor="@android:color/black"
                 android:layout_marginBottom="10dp"
                 android:padding="10dp"
@@ -75,7 +75,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Tổng chi: 0"
-                android:textSize="20sp"
+                android:textSize="15sp"
                 android:padding="10dp"
                 android:textColor="@android:color/black"
                 android:textStyle="bold"/>
@@ -93,7 +93,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Chi nhiều nhất: "
-                android:textSize="20sp"
+                android:textSize="15sp"
                 android:padding="10dp"
                 android:textColor="@android:color/black"
                 android:layout_marginBottom="10dp"
@@ -104,10 +104,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Chi ít nhất: "
-                android:textSize="20sp"
+                android:textSize="15sp"
                 android:padding="10dp"
                 android:textColor="@android:color/black"
                 android:textStyle="bold"/>
         </LinearLayout>
     </LinearLayout>
+    <com.voggella.android.doan.mainHome.FooterLayout
+        android:id="@+id/footerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        />
 </LinearLayout>

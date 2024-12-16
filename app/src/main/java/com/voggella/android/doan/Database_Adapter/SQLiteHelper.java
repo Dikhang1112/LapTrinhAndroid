@@ -1,4 +1,4 @@
-package com.voggella.android.doan.Database;
+package com.voggella.android.doan.Database_Adapter;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,7 +10,6 @@ import android.util.Log;
 
 import com.voggella.android.doan.mainHome.TransactionShow;
 
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
 {
     // Tên cơ sở dữ liệu
     private static final String DATABASE_NAME = "ManagementFinancial.db";
-    private static final int DATABASE_VERSION = 5 ; // Tăng giá trị khi thay đổi
+    private static final int DATABASE_VERSION = 8 ; // Tăng giá trị khi thay đổi
 
     //Tên các bảng
     public static final String  TB_Account = "Account";
@@ -47,6 +46,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
     public static final String COLUMN_USER_NOTE = "Users_Notes";
     public static final String COLUMN_USER_IMAGE = "Image";
 
+
     //Thuoc tinh cua Admin
     public static final String  COLUMN_ADMIN_ID = "Admin_Id";
     public static final String  COLUMN_ADMIN_NAME = "Admin_Name";
@@ -57,23 +57,23 @@ public class SQLiteHelper extends SQLiteOpenHelper
     public static final String  COLUMN_CATEGORY_USERSDT = "Category_UserSdt";
     public static final String  COLUMN_CATEGORY_NAME = "Category_Name";
     public static final String  COLUMN_CATEGORY_DATE = "Category_Date";
-     // Account Role
-     public enum CategoryName{
-         TRANSPORT("Transport"),
-         EDUCATION("Education"),
-         SHOPPING("Shopping"),
-         MEDICINE("Medicine"),
-         FOOD("Food");
-         private String name;
+    // Account Role
+    public enum CategoryName{
+        TRANSPORT("Transport"),
+        EDUCATION("Education"),
+        SHOPPING("Shopping"),
+        MEDICINE("Medicine"),
+        FOOD("Food");
+        private String name;
 
-         CategoryName(String name) {
-             this.name = name;
-         }
+        CategoryName(String name) {
+            this.name = name;
+        }
 
-         public String getName() {
-             return name;
-         }
-     }
+        public String getName() {
+            return name;
+        }
+    }
     public enum CategoryNameChart {
         TRANSPORT("Transport"),
         EDUCATION("Education"),
@@ -119,7 +119,6 @@ public class SQLiteHelper extends SQLiteOpenHelper
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Tạo bảng Users
         try {
             String CREATE_USERS_TABLE = "CREATE TABLE " + TB_USERS + "("
                     + COLUMN_USER_SDT + " TEXT PRIMARY KEY, "
@@ -179,7 +178,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
                     + "FOREIGN KEY (" + COLUMN_TRANSACTION_CATEGORY_ID + ") REFERENCES " + TB_Cate + "(" + COLUMN_CATEGORY_ID + ") ON DELETE CASCADE"
                     + ")";
             db.execSQL(CREATE_TRANSACTION_TABLE);
-        // Tạo bảng Budget
+            // Tạo bảng Budget
             String CREATE_BUDGET_TABLE = "CREATE TABLE " + TB_Budget + "("
                     + COLUMN_BUDGET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + COLUMN_BUDGET_USERS_SDT + " TEXT, "
@@ -191,10 +190,11 @@ public class SQLiteHelper extends SQLiteOpenHelper
             Log.d("SQLiteHelper", "Table " + TB_Budget + " created successfully");
 
         } catch (Exception e) {
-            Log.e("SQLiteHelper", "Error creating tables: " + e.getMessage());
+            Log.e("SQLiteHelper", "Error creating tables: " + e.getMessage(), e);
+            throw e;
         }
     }
-        @Override
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Xóa các bảng cũ nếu cần nâng cấp cơ sở dữ liệu
         db.execSQL("DROP TABLE IF EXISTS " + TB_Budget);
@@ -385,6 +385,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
             }
         }
     }
+
     // Giả sử trong SQLiteHelper của bạn có phương thức như sau:
     public List<TransactionShow> getTransactionsByType(String userPhone, String transactionType) {
         List<TransactionShow> transactionList = new ArrayList<>();
@@ -479,6 +480,183 @@ public class SQLiteHelper extends SQLiteOpenHelper
         return totalAmountByType;
     }
 
+    public ArrayList<UserModel> getAllUsers() {
+        ArrayList<UserModel> usersList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        try {
+            String[] columns = {
+                    COLUMN_USER_SDT,
+                    COLUMN_USER_NAME,
+                    COLUMN_USER_PASSWORD,
+                    COLUMN_USER_TYPE  // Thêm cột VIP vào truy vấn
+            };
+
+            Log.d("SQLiteHelper", "Executing query to get all users...");
+            Cursor cursor = db.query(
+                    TB_USERS,
+                    columns,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    @SuppressLint("Range")
+                    String phone = cursor.getString(cursor.getColumnIndex(COLUMN_USER_SDT));
+                    @SuppressLint("Range")
+                    String name = cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME));
+                    @SuppressLint("Range")
+                    String password = cursor.getString(cursor.getColumnIndex(COLUMN_USER_PASSWORD));
+                    @SuppressLint("Range")
+                    int vipStatus = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_TYPE));
+
+                    UserModel user = new UserModel(phone, name, password);
+                    user.setVip(vipStatus == 1);  // Set trạng thái VIP
+                    usersList.add(user);
+                    Log.d("SQLiteHelper", "Added user: " + name + ", VIP: " + (vipStatus == 1));
+                } while (cursor.moveToNext());
+            }
+
+            if (cursor != null) {
+                cursor.close();
+            }
+
+            Log.d("SQLiteHelper", "Found " + usersList.size() + " users");
+            return usersList;
+        } catch (Exception e) {
+            Log.e("SQLiteHelper", "Error getting users: " + e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    // Thêm người dùng mới
+    public long addUser(UserModel user) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_USER_SDT, user.getPhone());
+        values.put(COLUMN_USER_NAME, user.getName());
+        values.put(COLUMN_USER_PASSWORD, user.getPassword());
+
+        return db.insert(TB_USERS, null, values);
+    }
+
+    // Cập nhật thông tin người dùng
+    public int updateUser(UserModel user) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_USER_NAME, user.getName());
+        values.put(COLUMN_USER_PASSWORD, user.getPassword());
+
+
+        return db.update(TB_USERS, values,
+                COLUMN_USER_SDT + "=?",
+                new String[]{user.getPhone()});
+    }
+
+    // Xóa người dùng
+    public int deleteUser(String phone) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(TB_USERS,
+                COLUMN_USER_SDT + "=?",
+                new String[]{phone});
+    }
+
+    // Thêm phương thức cập nhật trạng thái VIP
+    public boolean updateUserVipStatus(String phone, boolean isVip) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_USER_TYPE, isVip ? 1 : 0);
+
+            int result = db.update(TB_USERS, values,
+                    COLUMN_USER_SDT + "=?",
+                    new String[]{phone});
+
+            Log.d("SQLiteHelper", "Updating VIP status for user " + phone + " to " + isVip +
+                    ". Result: " + (result > 0 ? "success" : "failed"));
+
+            return result > 0;
+        } catch (Exception e) {
+            Log.e("SQLiteHelper", "Error updating VIP status: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Thêm phương thức kiểm tra trạng thái VIP
+    public boolean isUserVip(String phone) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TB_USERS,
+                    new String[]{COLUMN_USER_TYPE},
+                    COLUMN_USER_SDT + "=?",
+                    new String[]{phone},
+                    null, null, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                @SuppressLint("Range")
+                int vipStatus = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_TYPE));
+                return vipStatus == 1;
+            }
+            return false;
+        } catch (Exception e) {
+            Log.e("SQLiteHelper", "Error checking VIP status: " + e.getMessage());
+            return false;
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+    }
+    //Kiem tra thong tin admin
+    public boolean checkAdmin(String name, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TB_Admin
+                + " WHERE " + COLUMN_ADMIN_NAME + " = ? AND "
+                + COLUMN_ADMIN_PASSWORD + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{name, password});
+        boolean exists = cursor.getCount() > 0; // Kiểm tra kết quả
+        cursor.close();
+        db.close();
+        return exists;
+    }
+    //Get user infor
+    public Cursor getUserInfo(String sdt) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT " + COLUMN_USER_SDT + ", "
+                + COLUMN_USER_SEX + ", "
+                + COLUMN_USER_BIRTHDAY
+                + " FROM " + TB_USERS
+                + " WHERE " + COLUMN_USER_SDT + " = ?";
+        return db.rawQuery(query, new String[]{sdt});
+    }
+//Get user type
+public int getUserType(String userSdt) {
+    int userType = 0; // Mặc định là 0
+    SQLiteDatabase db = this.getReadableDatabase();
+    Cursor cursor = null;
+
+    try {
+        // Truy vấn cột user_type dựa trên user_sdt
+        String query = "SELECT " + COLUMN_USER_TYPE + " FROM " + TB_USERS + " WHERE " + COLUMN_USER_SDT + "=?";
+        cursor = db.rawQuery(query, new String[]{userSdt});
+
+        // Kiểm tra nếu có dữ liệu
+        if (cursor != null && cursor.moveToFirst()) {
+            userType = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_USER_TYPE));
+        }
+    } catch (Exception e) {
+        Log.e("SQLiteHelper", "Error while fetching user type", e);
+    } finally {
+        if (cursor != null) cursor.close();
+        db.close();
+    }
+    return userType;
 }
 
 
+}
