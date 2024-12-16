@@ -29,6 +29,7 @@ public class AdminManagementActivity extends AppCompatActivity {
     private ListView listViewUsers;
     private Button btnThem, btnSua, btnXoa;
     private SQLiteHelper dbHelper;
+    private UserListAdapter userListAdapter; // Khai báo adapter toàn cục
     private UserListAdapter adapter;
     private UserModel selectedUser = null;
 
@@ -93,13 +94,13 @@ public class AdminManagementActivity extends AppCompatActivity {
     private void loadUsersList() {
         try {
             Log.d("AdminActivity", "Getting users from database...");
-            ArrayList<UserModel> usersList = dbHelper.getAllUsers();
+            ArrayList<UserModel> usersList = dbHelper.getAllUsers(); // Lấy danh sách người dùng từ database
 
             Log.d("AdminActivity", "Creating adapter...");
-            adapter = new UserListAdapter(this, usersList);
+            userListAdapter = new UserListAdapter(this, usersList); // Khởi tạo adapter với danh sách người dùng
 
             Log.d("AdminActivity", "Setting adapter to ListView...");
-            listViewUsers.setAdapter(adapter);
+            listViewUsers.setAdapter(userListAdapter); // Gán adapter cho ListView
 
             Log.d("AdminActivity", "Users list loaded successfully with " + usersList.size() + " users");
         } catch (Exception e) {
@@ -107,9 +108,9 @@ public class AdminManagementActivity extends AppCompatActivity {
             throw e; // Ném lại exception để onCreate có thể bắt được
         }
     }
-   //Xu li sụ kien chon user
+
+    //Xu li sụ kien chon user
     private void setupListeners() {
-        // Xử lý chọn user từ danh sách
         listViewUsers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -118,10 +119,15 @@ public class AdminManagementActivity extends AppCompatActivity {
                 Toast.makeText(AdminManagementActivity.this,
                         "Đã chọn: " + selectedUser.getName(),
                         Toast.LENGTH_SHORT).show();
+
+                if (userListAdapter != null) { // Kiểm tra userListAdapter không null
+                    userListAdapter.setSelectedPosition(position);
+                } else {
+                    Log.e("AdminActivity", "userListAdapter is null in setupListeners");
+                }
             }
         });
-
-        // Nút thêm user
+    // Nút thêm user
         btnThem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -293,4 +299,6 @@ public class AdminManagementActivity extends AppCompatActivity {
                 .setNegativeButton("Hủy", null)
                 .show();
     }
+
 }
+

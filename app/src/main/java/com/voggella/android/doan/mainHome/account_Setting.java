@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.CrossProcessCursor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -14,6 +15,8 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,7 +35,7 @@ import java.io.InputStream;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class account_Setting extends AppCompatActivity {
+public class account_Setting extends AppCompatActivity implements GenderAndBirthFragment.OnDataSavedListener {
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int REQUEST_PERMISSION_CODE = 1;
     private TextView tvSdt, tvSex, tvBirth;
@@ -88,7 +91,7 @@ public class account_Setting extends AppCompatActivity {
                 if(sex == null && birth == null )
                 {
                     tvBirth.setText("Ban chưa nhập thông tin");
-                    tvSex.setText("Click vào đây để bổ sung thông tin");
+                    tvSex.setText("Click vào đây");
                 }
                 else {
                     tvSex.setText("Giới tính: " + sex);
@@ -102,14 +105,23 @@ public class account_Setting extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Không nhận được thông tin user", Toast.LENGTH_SHORT).show();
         }
+
+        tvSex.setOnClickListener(v -> {
+            String currentGender = tvSex.getText().toString();
+            String currentDateOfBirth = tvBirth.getText().toString();
+
+            GenderAndBirthFragment fragment = GenderAndBirthFragment.newInstance(currentGender, currentDateOfBirth);
+            fragment.setOnDataSavedListener((GenderAndBirthFragment.OnDataSavedListener) this);
+            fragment.show(getSupportFragmentManager(), "GenderAndBirthFragment");
+        });
         //Xu li su kien an hien ImageView
         crownImage = findViewById(R.id.crownImage);
         int userType = dbHelper.getUserType(phoneUser);
         // Kiểm tra user_type để ẩn/hiện ImageView
         if (userType == 0) {
-            crownImage.setVisibility(ImageView.GONE); // Ẩn vương miện
+            crownImage.setVisibility(ImageView.GONE); // Ẩn icon
         } else if (userType == 1) {
-            crownImage.setVisibility(ImageView.VISIBLE); // Hiển thị vương miện
+            crownImage.setVisibility(ImageView.VISIBLE); // Hiển thị icon
         }
         // Xử lý sự kiện đăng xuất
         logout.setOnClickListener(v -> {
@@ -248,4 +260,26 @@ public class account_Setting extends AppCompatActivity {
         }
         return null;
     }
+    public void onDataSaved(String gender, String dateOfBirth) {
+        // Cập nhật dữ liệu vào TextView
+        tvSex.setText(gender);
+        tvBirth.setText(dateOfBirth);
+        updateUserGenderAndBirthday(phoneUser, gender, dateOfBirth);
+    }
+
+    // Phương thức cập nhật cơ sở dữ liệu
+    private void updateUserGenderAndBirthday(String phoneUser, String gender, String birthday) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(SQLiteHelper.COLUMN_USER_SEX, gender);
+        values.put(SQLiteHelper.COLUMN_USER_BIRTHDAY, birthday);
+
+        String whereClause = SQLiteHelper.COLUMN_USER_SDT + " = ?";
+        String[] whereArgs = {phoneUser};
+
+        db.update(SQLiteHelper.TB_USERS, values, whereClause, whereArgs);
+        db.close();
+    }
+
 }

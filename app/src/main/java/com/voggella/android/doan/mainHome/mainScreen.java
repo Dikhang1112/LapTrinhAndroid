@@ -2,6 +2,7 @@ package com.voggella.android.doan.mainHome;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -43,39 +44,40 @@ public class mainScreen extends AppCompatActivity {
     private ImageView imageNoti;
     private int notificationCount = 0; //Bien dem thong bao
     private Switch switchDarkMode;
+    private SharedPreferences sharedPreferences;
     private boolean isVipUser = false;
     private FooterLayout footerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.main_screen);
 
         // Khởi tạo database trước để có thể kiểm tra VIP
         dbHelper = new SQLiteHelper(this);
         // Lấy thông tin user và kiểm tra VIP
         phoneUser = getIntent().getStringExtra("USERS_SDT");
         userName = getIntent().getStringExtra("USER_FULL_NAME");
-        if (phoneUser != null) {
-            isVipUser = checkIsUserVip(phoneUser);
-            // Áp dụng theme dựa trên trạng thái VIP và darkmode
-            if (isVipUser) {
-                boolean savedDarkMode = getDarkModeState();
-                AppCompatDelegate.setDefaultNightMode(
-                        savedDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
-                );
+
+        //Khoi tao ui cho switch
+        switchDarkMode = findViewById(R.id.switchDarkMode);
+        switchDarkMode.setChecked(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES);
+
+        // Lắng nghe sự kiện thay đổi của Switch
+        switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                // Chuyển sang chế độ tối
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             } else {
-                // User thường luôn ở light mode
+                // Chuyển sang chế độ sáng
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             }
-        }
-
-        setContentView(R.layout.main_screen);
+        });
 
         // Khởi tạo ImageView và TextView
         footerLayout = findViewById(R.id.footerLayout);
         textNotificationCount = findViewById(R.id.textNotificationCount);
         imageNoti = findViewById(R.id.imageNoti);
-        switchDarkMode = findViewById(R.id.switchDarkMode);
 
         //Lay sdt va ho ten cho footer
         footerLayout.setUserData(phoneUser,userName);
@@ -182,9 +184,6 @@ public class mainScreen extends AppCompatActivity {
 
         // Kiểm tra quyền VIP
         checkVipStatus();
-
-        // Xử lý sự kiện thay đổi darkmode
-        setupDarkModeSwitch();
     }
 
     private void checkVipStatus() {
@@ -223,45 +222,7 @@ public class mainScreen extends AppCompatActivity {
         }
     }
 
-    private void setupDarkModeSwitch() {
-        if (isVipUser) {
-            switchDarkMode.setVisibility(View.VISIBLE);
-            boolean savedDarkMode = getDarkModeState();
-            switchDarkMode.setChecked(savedDarkMode);
 
-            switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                try {
-                    saveDarkModeState(isChecked);
-                    if (isChecked) {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    } else {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    }
-                    // Recreate activity để áp dụng theme mới
-                    recreate();
-                } catch (Exception e) {
-                    Log.e("MainScreen", "Error changing theme: " + e.getMessage());
-                }
-            });
-        } else {
-            switchDarkMode.setVisibility(View.GONE);
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
-    }
-
-    // Thêm phương thức lưu trạng thái darkmode
-    private void saveDarkModeState(boolean isDarkMode) {
-        getSharedPreferences("app_settings", MODE_PRIVATE)
-                .edit()
-                .putBoolean("dark_mode_" + phoneUser, isDarkMode)
-                .apply();
-    }
-
-    // Thêm phương thức đọc trạng thái darkmode
-    private boolean getDarkModeState() {
-        return getSharedPreferences("app_settings", MODE_PRIVATE)
-                .getBoolean("dark_mode_" + phoneUser, false);
-    }
 
     private void refreshData() {
         if (itemList != null && multiTypeAdapter != null) {
@@ -467,6 +428,17 @@ public class mainScreen extends AppCompatActivity {
             Log.e("MainScreen", "Error checking VIP status: " + e.getMessage());
         }
         return false;
+    }
+    private boolean getDarkModeState() {
+        sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
+        return sharedPreferences.getBoolean("dark_mode", false);
+    }
+
+    // Hàm lưu trạng thái Dark Mode vào SharedPreferences
+    private void saveDarkModeState(boolean isDarkMode) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("dark_mode", isDarkMode);
+        editor.apply();
     }
 
 }

@@ -123,19 +123,32 @@ public class chartJs extends AppCompatActivity {
 
         ArrayList<String> categories = new ArrayList<>(totalAmountByType.keySet());
         ArrayList<BarEntry> entries = new ArrayList<>();
+        ArrayList<Integer> colors = new ArrayList<>(); // Danh sách màu sắc cho từng cột
         int i = 0;
+
+        // Tạo danh sách màu sắc cho các cột
         for (Map.Entry<String, Double> entry : totalAmountByType.entrySet()) {
             entries.add(new BarEntry(i, entry.getValue().floatValue()));
+
+            // Thêm màu sắc cho từng cột. Bạn có thể thay đổi màu tùy ý.
+            if (i % 2 == 0) {
+                colors.add(Color.RED); // Màu đỏ cho cột chẵn
+            } else {
+                colors.add(Color.BLUE); // Màu xanh dương cho cột lẻ
+            }
+
             i++;
         }
         BarDataSet barDataSet = new BarDataSet(entries, "Số tiền cho các giao dịch");
         barDataSet.setValueTextSize(10f);
         barDataSet.setValueTextColor(Color.MAGENTA);
-        barDataSet.setColor(getResources().getColor(R.color.colorPrimary));
+        barDataSet.setColors(colors); // Áp dụng màu sắc cho các cột
         barDataSet.setDrawValues(false);
+
         BarData barData = new BarData(barDataSet);
         barChart.setData(barData);
         barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(categories));
+
         configureChartAppearance();
         barChart.animateXY(1000, 1000);
         barChart.invalidate();

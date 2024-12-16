@@ -54,7 +54,7 @@ public class checkInfor  extends AppCompatActivity {
             dbHelper.insertTran(phone);
             dbHelper.insertAccount(phone);
             dbHelper.insertCate(phone);
-
+            dbHelper.addDefaultAdmin();
             //Thong bao
             Toast.makeText(this, "Lưu thành công!", Toast.LENGTH_SHORT).show();
             if (radioGender.getCheckedRadioButtonId() == -1) {

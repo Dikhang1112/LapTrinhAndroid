@@ -19,7 +19,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
 {
     // Tên cơ sở dữ liệu
     private static final String DATABASE_NAME = "ManagementFinancial.db";
-    private static final int DATABASE_VERSION = 8 ; // Tăng giá trị khi thay đổi
+    private static final int DATABASE_VERSION = 10 ; // Tăng giá trị khi thay đổi
 
     //Tên các bảng
     public static final String  TB_Account = "Account";
@@ -385,6 +385,23 @@ public class SQLiteHelper extends SQLiteOpenHelper
             }
         }
     }
+    public void addDefaultAdmin() {
+        SQLiteDatabase db = this.getWritableDatabase(); // Lấy cơ sở dữ liệu ghi được
+        ContentValues values = new ContentValues();
+        // Thêm giá trị cho các cột
+        values.put(COLUMN_ADMIN_NAME, "admin");
+        values.put(COLUMN_ADMIN_PASSWORD, "@123");
+
+        // Chèn vào bảng TB_Admin
+        long result = db.insert(TB_Admin, null, values);
+        if (result == -1) {
+            Log.e("SQLiteHelper", "Failed to insert default admin");
+        } else {
+            Log.d("SQLiteHelper", "Default admin inserted successfully");
+        }
+
+        db.close(); // Đóng kết nối cơ sở dữ liệu
+    }
 
     // Giả sử trong SQLiteHelper của bạn có phương thức như sau:
     public List<TransactionShow> getTransactionsByType(String userPhone, String transactionType) {
@@ -489,7 +506,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
                     COLUMN_USER_SDT,
                     COLUMN_USER_NAME,
                     COLUMN_USER_PASSWORD,
-                    COLUMN_USER_TYPE  // Thêm cột VIP vào truy vấn
+                    COLUMN_USER_TYPE  // Thêm cột Type vào truy vấn
             };
 
             Log.d("SQLiteHelper", "Executing query to get all users...");
