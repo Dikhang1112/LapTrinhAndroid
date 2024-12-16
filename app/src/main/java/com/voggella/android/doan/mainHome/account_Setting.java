@@ -91,11 +91,10 @@ public class account_Setting extends AppCompatActivity {
                     tvSex.setText("Click vào đây để bổ sung thông tin");
                 }
                 else {
-                    tvSdt.setText("SDT: " + sdt);
                     tvSex.setText("Giới tính: " + sex);
                     tvBirth.setText("Ngày sinh " + birth);
                 }
-
+                tvSdt.setText("SDT: " + sdt);
                 cursor.close(); // Đóng Cursor
             } else {
                 Toast.makeText(this, "User không có thông tin ", Toast.LENGTH_SHORT).show();
