@@ -59,6 +59,7 @@ public class mainScreen extends AppCompatActivity {
         phoneUser = getIntent().getStringExtra("USERS_SDT");
         userName = getIntent().getStringExtra("USER_FULL_NAME");
 
+
         //Khoi tao ui cho switch
         switchDarkMode = findViewById(R.id.switchDarkMode);
         switchDarkMode.setChecked(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES);

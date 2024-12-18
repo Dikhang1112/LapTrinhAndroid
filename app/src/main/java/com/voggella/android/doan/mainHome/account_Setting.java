@@ -262,8 +262,8 @@ public class account_Setting extends AppCompatActivity implements GenderAndBirth
     }
     public void onDataSaved(String gender, String dateOfBirth) {
         // Cập nhật dữ liệu vào TextView
-        tvSex.setText(gender);
-        tvBirth.setText(dateOfBirth);
+        tvSex.setText("Giới tính:" + gender);
+        tvBirth.setText("Ngày sinh" + dateOfBirth);
         updateUserGenderAndBirthday(phoneUser, gender, dateOfBirth);
     }
 

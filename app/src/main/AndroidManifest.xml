@@ -8,8 +8,8 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:requestLegacyExternalStorage="true"
-        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:configChanges="uiMode"
         android:supportsRtl="true"
         android:theme="@style/Theme.DoAn"
         tools:targetApi="31">
@@ -20,14 +20,15 @@
         <activity android:name=".GiaoDienLogin.ScreenWait" />
         <activity android:name=".GiaoDienLogin.checkInfor" />
         <activity android:name=".GiaoDienLogin.AdminLogin" />
-        <activity android:name=".mainHome.mainScreen" />
+        <activity android:name=".mainHome.mainScreen" ></activity>
         <activity android:name=".mainHome.chartJs" />
         <activity android:name=".mainHome.add_Trans" />
         <activity android:name=".mainHome.trans_Detail" />
         <activity android:name=".mainHome.account_Setting" />
         <activity android:name=".GiaoDienLogin.AdminManagementActivity"></activity>
+        <activity android:name=".GiaoDienLogin.Login"/>
 
-        <activity android:name=".GiaoDienLogin.Login"
+        <activity android:name=".GiaoDienLogin.startScreen"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

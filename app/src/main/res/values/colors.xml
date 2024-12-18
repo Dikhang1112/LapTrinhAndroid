@@ -14,6 +14,7 @@
 
     <!-- Màu cho Light mode -->
     <color name="background_main">#F6F1F1</color>
+    <color name="text_color">#FFFFFF</color>
     <color name="background_header">#FFFFFF</color>
     <color name="background_card">#00BFFF</color>
     <color name="text_primary">#000000</color>

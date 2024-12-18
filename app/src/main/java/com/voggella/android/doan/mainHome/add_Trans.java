@@ -3,8 +3,10 @@ package com.voggella.android.doan.mainHome;
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -32,6 +34,7 @@ public class add_Trans extends AppCompatActivity {
     private Calendar calendar;
     private String phoneUser;
     private String userName;
+    private SQLiteHelper dbHelper;
 
 
     @Override
@@ -42,6 +45,8 @@ public class add_Trans extends AppCompatActivity {
         Intent intent = getIntent();
         phoneUser = intent.getStringExtra("USERS_SDT");
         userName = intent.getStringExtra("USER_FULL_NAME");
+        dbHelper = new SQLiteHelper(this);
+
 
         // Initialize UI elements
         spinnerGroupsCate = findViewById(R.id.spinner_groupsCate);
@@ -107,23 +112,41 @@ public class add_Trans extends AppCompatActivity {
 
         // Save button click event
         btnSaveTransaction.setOnClickListener(v -> {
-            String amount = etAmount.getText().toString();
+            String amountStr = etAmount.getText().toString();
             String note = etNote.getText().toString();
             String date = tvDate.getText().toString();
 
             // Check if fields are filled
-            if (amount.isEmpty() || date.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            if (amountStr.isEmpty() || date.isEmpty()) {
+                Toast.makeText(this, "Hãy điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // Insert transaction into the database
-            insertTransaction(phoneUser,amount, selectedCategory,note,date);
-            Intent backLoad = new Intent(add_Trans.this,mainScreen.class);
-            backLoad.putExtra("USERS_SDT",phoneUser);
-            backLoad.putExtra("USER_FULL_NAME",userName);
-            startActivity(backLoad);
-            finish();
+
+            // Parse amount to double
+            double amount = Double.parseDouble(amountStr);
+
+            // Get total budget
+            double totalBudget = getTotalBudget(phoneUser);
+            double totalTransac = getTotalTransaction(phoneUser);
+            double balance = totalBudget - totalTransac;
+
+            // Check if totalBudget is sufficient
+            if (balance < amount) {
+                Toast.makeText(this, "Số dư của bạn không đủ", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            else {
+                // Insert transaction into the database
+                insertTransaction(phoneUser, amountStr, selectedCategory, note, date);
+                // Navigate back to main screen
+                Intent backLoad = new Intent(add_Trans.this, mainScreen.class);
+                backLoad.putExtra("USERS_SDT", phoneUser);
+                backLoad.putExtra("USER_FULL_NAME", userName);
+                startActivity(backLoad);
+                finish();
+            }
         });
+
     }
 
     // Method to format the date
@@ -145,10 +168,52 @@ public class add_Trans extends AppCompatActivity {
         // Insert into TRANSACTION table
         long rowId = db.insert(SQLiteHelper.TB_Trans, null, values);
         if (rowId != -1) {
-            Toast.makeText(this, "Transaction added successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Thêm giao dịch thành công", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Failed to add transaction", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Thêm giao dịch thất bại", Toast.LENGTH_SHORT).show();
         }
         db.close();
+    }
+    private double getTotalBudget(String phoneUser) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        double total = 0;
+        Cursor cursor = null;
+
+        try {
+            String query = "SELECT SUM(" + SQLiteHelper.COLUMN_BUDGET_DATA + ") FROM " + SQLiteHelper.TB_Budget + " WHERE " + SQLiteHelper.COLUMN_BUDGET_USERS_SDT + " = ?";
+            cursor = db.rawQuery(query, new String[]{phoneUser});
+
+            if (cursor != null && cursor.moveToFirst()) {
+                total = cursor.getDouble(0);
+            }
+        } catch (Exception e) {
+            Log.e("mainScreen", "Lỗi khi tính tổng ngân sách", e);
+        } finally {
+            if (cursor != null) cursor.close();
+            if (db != null) db.close();
+        }
+
+        return total;
+    }
+    private double getTotalTransaction(String phoneUser) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        double total = 0;
+        Cursor cursor = null;
+
+        try {
+            String query = "SELECT SUM(" + SQLiteHelper.COLUMN_TRANSACTION_AMOUNT + ") FROM " + SQLiteHelper.TB_Trans + " WHERE " + SQLiteHelper.COLUMN_TRANSACTION_USERS_SDT + " = ?";
+            cursor = db.rawQuery(query, new String[]{phoneUser});
+
+            if (cursor != null && cursor.moveToFirst()) {
+                total = cursor.getDouble(0);
+            }
+        } catch (Exception e) {
+            Log.e("mainScreen", "Lỗi khi tính tổng giao dịch", e);
+        } finally {
+            if (cursor != null) cursor.close();
+            if (db != null) db.close();
+        }
+
+        return total;
     }
 }

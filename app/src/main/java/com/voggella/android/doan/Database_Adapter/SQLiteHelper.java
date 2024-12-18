@@ -19,7 +19,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
 {
     // Tên cơ sở dữ liệu
     private static final String DATABASE_NAME = "ManagementFinancial.db";
-    private static final int DATABASE_VERSION = 10 ; // Tăng giá trị khi thay đổi
+    private static final int DATABASE_VERSION = 11 ; // Tăng giá trị khi thay đổi
 
     //Tên các bảng
     public static final String  TB_Account = "Account";
@@ -32,6 +32,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
     //Thuoc tinh cua bang Account
     public static final String  COLUMN_ACCOUNT_ID = "Account_Id";
     public static final String  COLUMN_ACCOUNT_ROLE = "Account_Role";
+    public static final String  COLUMN_ACCOUNT_ADMINNAME = "Account_AdminName";
     public static final String  COLUMN_ACCOUNT_USERS_SDT = "Account_Users_SDT";
 
     //Thuoc tinh cua Users
@@ -121,7 +122,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase db) {
         try {
             String CREATE_USERS_TABLE = "CREATE TABLE " + TB_USERS + "("
-                    + COLUMN_USER_SDT + " TEXT PRIMARY KEY, "
+                    + COLUMN_USER_SDT + " INTEGER PRIMARY KEY, "
                     + COLUMN_USER_NAME + " TEXT, "
                     + COLUMN_USER_PASSWORD + " TEXT, "
                     + COLUMN_USER_CCCD + " TEXT, "
@@ -135,29 +136,32 @@ public class SQLiteHelper extends SQLiteOpenHelper
             db.execSQL(CREATE_USERS_TABLE);
             Log.d("SQLiteHelper", "Table " + TB_USERS + " created successfully");
 
-            // Tạo bảng Account
-            String CREATE_ACCOUNTS_TABLE = "CREATE TABLE " + TB_Account + "("
-                    + COLUMN_ACCOUNT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + COLUMN_ACCOUNT_ROLE + " TEXT CHECK(" + COLUMN_ACCOUNT_ROLE + " IN ('User', 'Admin')),"
-                    + COLUMN_ACCOUNT_USERS_SDT + " TEXT, "
-                    + "FOREIGN KEY (" + COLUMN_ACCOUNT_USERS_SDT + ") REFERENCES " + TB_USERS + "(" + COLUMN_USER_SDT + ") ON DELETE CASCADE"
-                    + ")";
-            db.execSQL(CREATE_ACCOUNTS_TABLE);
-            Log.d("SQLiteHelper", "Table " + TB_Account + " created successfully");
-
             // Tạo bảng Admin
             String CREATE_ADMIN_TABLE = "CREATE TABLE " + TB_Admin + "("
                     + COLUMN_ADMIN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + COLUMN_ADMIN_NAME + " TEXT, "
+                    + COLUMN_ADMIN_NAME + " TEXT UNIQUE, "  // Đảm bảo Admin_Name là duy nhất
                     + COLUMN_ADMIN_PASSWORD + " TEXT"
                     + ")";
             db.execSQL(CREATE_ADMIN_TABLE);
             Log.d("SQLiteHelper", "Table " + TB_Admin + " created successfully");
 
+// Tạo bảng Account
+            String CREATE_ACCOUNTS_TABLE = "CREATE TABLE " + TB_Account + "("
+                    + COLUMN_ACCOUNT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + COLUMN_ACCOUNT_ROLE + " TEXT CHECK(" + COLUMN_ACCOUNT_ROLE + " IN ('User', 'Admin')),"
+                    + COLUMN_ACCOUNT_USERS_SDT + " INTEGER, "
+                    + COLUMN_ACCOUNT_ADMINNAME + " TEXT, "
+                    + "FOREIGN KEY (" + COLUMN_ACCOUNT_USERS_SDT + ") REFERENCES " + TB_USERS + "(" + COLUMN_USER_SDT + ") ON DELETE CASCADE,"
+                    + "FOREIGN KEY (" + COLUMN_ACCOUNT_ADMINNAME + ") REFERENCES " + TB_Admin + "(" + COLUMN_ADMIN_NAME + ") ON DELETE CASCADE"
+                    + ")";
+            db.execSQL(CREATE_ACCOUNTS_TABLE);
+            Log.d("SQLiteHelper", "Table " + TB_Account + " created successfully");
+
+
             // Tạo bảng Category
             String CREATE_CATEGORY_TABLE = "CREATE TABLE " + TB_Cate + "("
                     + COLUMN_CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + COLUMN_CATEGORY_USERSDT + " TEXT, "
+                    + COLUMN_CATEGORY_USERSDT + " INTEGER, "
                     + COLUMN_CATEGORY_NAME + " TEXT,"
                     + COLUMN_CATEGORY_DATE + " TEXT, "
                     + "FOREIGN KEY (" + COLUMN_CATEGORY_USERSDT + ") REFERENCES " + TB_USERS + "(" + COLUMN_USER_SDT + ") ON DELETE CASCADE"
@@ -168,7 +172,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
             // Tạo bảng TRANSACTION
             String CREATE_TRANSACTION_TABLE = "CREATE TABLE " + TB_Trans + "("
                     + COLUMN_TRANSACTION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + COLUMN_TRANSACTION_USERS_SDT + " TEXT, "
+                    + COLUMN_TRANSACTION_USERS_SDT + " INTEGER, "
                     + COLUMN_TRANSACTION_AMOUNT + " REAL, "
                     + COLUMN_TRANSACTION_TYPE + " TEXT,"
                     + COLUMN_TRANSACTION_DATE + " TEXT, "
@@ -181,7 +185,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
             // Tạo bảng Budget
             String CREATE_BUDGET_TABLE = "CREATE TABLE " + TB_Budget + "("
                     + COLUMN_BUDGET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + COLUMN_BUDGET_USERS_SDT + " TEXT, "
+                    + COLUMN_BUDGET_USERS_SDT + " INTEGER, "
                     + COLUMN_BUDGET_DATA + " REAL, "
                     + COLUMN_BUDGET_DATE + " TEXT, "
                     + "FOREIGN KEY (" + COLUMN_BUDGET_USERS_SDT + ") REFERENCES " + TB_USERS + "(" + COLUMN_USER_SDT + ") ON DELETE CASCADE"
@@ -278,6 +282,23 @@ public class SQLiteHelper extends SQLiteOpenHelper
             db.close();  // Đóng kết nối
         }
     }
+    // Kiem tra sdt
+    public boolean isPhoneExists(String phone) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            String query = "SELECT 1 FROM " + TB_USERS + " WHERE " + COLUMN_USER_SDT + " = ?";
+            cursor = db.rawQuery(query, new String[]{phone});
+            return cursor.moveToFirst(); // Trả về true nếu có dữ liệu
+        } catch (Exception e) {
+            Log.e("SQLiteHelper", "Error checking phone existence: " + e.getMessage());
+            return false; // Trả về false nếu có lỗi
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close(); // Đóng kết nối
+        }
+    }
+
 
     //Them Budget vao Database
     public void addBudget(String userPhone, double data, String date) {
@@ -349,8 +370,8 @@ public class SQLiteHelper extends SQLiteOpenHelper
             }
         }
     }
-    //Them thong tin vao bang Account
-    public void insertAccount(String userSDT) {
+    //Them thong tin vao bang Account (User)
+    public void insertAccountUser(String userSDT) {
         SQLiteDatabase db = null;
         try {
             // Mở cơ sở dữ liệu
@@ -368,6 +389,24 @@ public class SQLiteHelper extends SQLiteOpenHelper
             }
         }
     }
+    public void insertAccountAdmin(String adminName) {
+    SQLiteDatabase db = null;
+    try {
+        // Mở cơ sở dữ liệu
+        db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(SQLiteHelper.COLUMN_ACCOUNT_ROLE,"Admin");
+        values.put(SQLiteHelper.COLUMN_ACCOUNT_ADMINNAME, adminName);
+        // Chèn dữ liệu vào bảng Account
+        db.insert(SQLiteHelper.TB_Account, null, values);
+    } catch (Exception e) {
+        e.printStackTrace();  // Xử lý lỗi nếu có
+    } finally {
+        if (db != null && db.isOpen()) {
+            db.close();  // Đảm bảo đóng kết nối cơ sở dữ liệu sau khi xong
+        }
+    }
+}
     public void insertCate(String userSDT) {
         SQLiteDatabase db = null;
         try {
@@ -375,7 +414,7 @@ public class SQLiteHelper extends SQLiteOpenHelper
             db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put(SQLiteHelper.COLUMN_CATEGORY_USERSDT, userSDT);
-            // Chèn dữ liệu vào bảng BUDGET
+            // Chèn dữ liệu vào bảng Cate
             db.insert(SQLiteHelper.TB_Cate, null, values);
         } catch (Exception e) {
             e.printStackTrace();  // Xử lý lỗi nếu có
@@ -387,21 +426,31 @@ public class SQLiteHelper extends SQLiteOpenHelper
     }
     public void addDefaultAdmin() {
         SQLiteDatabase db = this.getWritableDatabase(); // Lấy cơ sở dữ liệu ghi được
-        ContentValues values = new ContentValues();
-        // Thêm giá trị cho các cột
-        values.put(COLUMN_ADMIN_NAME, "admin");
-        values.put(COLUMN_ADMIN_PASSWORD, "@123");
 
-        // Chèn vào bảng TB_Admin
-        long result = db.insert(TB_Admin, null, values);
-        if (result == -1) {
-            Log.e("SQLiteHelper", "Failed to insert default admin");
+        // Kiểm tra xem admin đã tồn tại trong cơ sở dữ liệu chưa
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TB_Admin + " WHERE " + COLUMN_ADMIN_NAME + " = ?", new String[]{"admin"});
+
+        // Nếu chưa tồn tại admin thì thêm vào
+        if (cursor.getCount() == 0) {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_ADMIN_NAME, "admin");
+            values.put(COLUMN_ADMIN_PASSWORD, "@123");
+
+            // Chèn vào bảng TB_Admin
+            long result = db.insert(TB_Admin, null, values);
+            if (result == -1) {
+                Log.e("SQLiteHelper", "Failed to insert default admin");
+            } else {
+                Log.d("SQLiteHelper", "Default admin inserted successfully");
+            }
         } else {
-            Log.d("SQLiteHelper", "Default admin inserted successfully");
+            Log.d("SQLiteHelper", "Admin already exists. No insertion needed.");
         }
 
+        cursor.close(); // Đóng cursor sau khi sử dụng
         db.close(); // Đóng kết nối cơ sở dữ liệu
     }
+
 
     // Giả sử trong SQLiteHelper của bạn có phương thức như sau:
     public List<TransactionShow> getTransactionsByType(String userPhone, String transactionType) {
@@ -674,6 +723,4 @@ public int getUserType(String userSdt) {
     }
     return userType;
 }
-
-
 }

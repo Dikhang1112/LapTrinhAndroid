@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -32,6 +35,7 @@ public class SignIn extends AppCompatActivity {
         EditText edtPhone = findViewById(R.id.user_Sdt);
         EditText edtPass = findViewById(R.id.pass_SignIn);
         Button signIn = findViewById(R.id.user_SignIn);
+        SQLiteHelper dbHelper = new SQLiteHelper(SignIn.this);
 
         signIn.setOnClickListener(v -> {
             String phone = edtPhone.getText().toString().trim();
@@ -42,7 +46,7 @@ public class SignIn extends AppCompatActivity {
                 return;
             }
 
-            SQLiteHelper dbHelper = new SQLiteHelper(SignIn.this);
+
 
             try {
                 // Kiểm tra người dùng có hợp lệ hay không
@@ -81,15 +85,18 @@ public class SignIn extends AppCompatActivity {
         Button changePass = findViewById(R.id.changepass);
         changePass.setOnClickListener(view -> {
             String phone = edtPhone.getText().toString().trim();  // Lấy số điện thoại từ EditText
-            if (phone.isEmpty()) {
-                Toast.makeText(SignIn.this, "Vui lòng nhập số điện thoại!", Toast.LENGTH_SHORT).show();
-                return;
+            boolean isSdt = dbHelper.isPhoneExists(phone);
+            if (isSdt) {
+                // Truyền số điện thoại vào Intent khi chuyển sang màn hình ChangePass
+                Intent intentChangePass = new Intent(SignIn.this, ChangePass.class);
+                intentChangePass.putExtra("USERS_SDT", phone);  // Truyền số điện thoại vào Intent
+                intentChangePass.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intentChangePass);
             }
-            // Truyền số điện thoại vào Intent khi chuyển sang màn hình ChangePass
-            Intent intentChangePass = new Intent(SignIn.this, ChangePass.class);
-            intentChangePass.putExtra("USERS_SDT", phone);  // Truyền số điện thoại vào Intent
-            intentChangePass.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intentChangePass);
+           else {
+                Toast.makeText(SignIn.this, "Không tìm thấy sdt này " , Toast.LENGTH_SHORT).show();
+            }
         });
     }
+
 }

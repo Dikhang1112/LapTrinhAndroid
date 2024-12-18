@@ -50,11 +50,14 @@ public class checkInfor  extends AppCompatActivity {
             }
             // Lưu dữ liệu vào SQLite User,Budget,Transac,Account,Cate
             dbHelper.addUser(phone, password1, fullName, address, dob, cccd, gender,notes,"0");
+            dbHelper.addDefaultAdmin();
+            dbHelper.insertAccountAdmin("admin");
+            dbHelper.insertAccountUser(phone);
+            dbHelper.insertCate(phone);
             dbHelper.insertBudget(phone);
             dbHelper.insertTran(phone);
-            dbHelper.insertAccount(phone);
-            dbHelper.insertCate(phone);
-            dbHelper.addDefaultAdmin();
+
+
             //Thong bao
             Toast.makeText(this, "Lưu thành công!", Toast.LENGTH_SHORT).show();
             if (radioGender.getCheckedRadioButtonId() == -1) {
