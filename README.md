@@ -1,2 +1,2 @@
 # BTL_Android
-Còn bị lỗi
+Duy Khang và Xuân Khánh
